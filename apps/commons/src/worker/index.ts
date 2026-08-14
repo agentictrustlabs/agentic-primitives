@@ -217,8 +217,30 @@ app.post('/api/connect/start', async (c) => {
       { state: start.state, nonce: start.nonce, codeVerifier: start.codeVerifier, authOrigin: start.authOrigin, template },
       cfg.sessionSecret,
     );
+
+    /*
+      THE CEREMONY URL NEEDS THE HANDOFF TOO, and leaving it off was worse than leaving it off the
+      other Home links.
+
+      A person signed in through the shared test identities has no session AT THE HOME. Arriving at
+      the authorize URL without one, the Home cannot see who they are, so the org-create ceremony
+      has no session token to route the signature with — and `signHashFor` falls through its
+      wallet branch to the injected provider. MetaMask opens, asking a browser wallet to sign for an
+      account whose key the Home holds. Nobody can approve that prompt.
+
+      With the handoff the Home recognises them, the demo-custody probe answers, and the ceremony
+      signs server-side with no prompt at all — which is the whole point of a shared identity.
+
+      A FRAGMENT, so the session never reaches a server, a referrer, or a log. Present only when
+      this app actually holds a Home session; every other sign-in route already has one there.
+    */
+    const session = c.get('session');
+    const url = session?.homeSession
+      ? `${start.url}#session=${encodeURIComponent(session.homeSession)}`
+      : start.url;
+
     return c.json(
-      { url: start.url },
+      { url },
       { headers: { 'set-cookie': cookieHeaders(c.req.url).setPending(pending) } },
     );
   } catch (e) {
