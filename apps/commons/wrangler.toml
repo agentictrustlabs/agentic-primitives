@@ -1,0 +1,83 @@
+# Commons — one Worker. It serves the SPA and proxies the live rails. No D1, no KV, no Durable
+# Object, no queue: every durable record this app touches lives in the owner's vault, reached
+# through delegations they signed. That is why the deploy is one command.
+#
+#   pnpm --filter @starter/commons deploy
+#
+# BEFORE THE FIRST DEPLOY, two things:
+#   1. wrangler secret put SESSION_SECRET      # any 32+ random bytes; encrypts the session cookie
+#   2. register this Worker's URL at the Home  # docs/register-your-app.md
+#
+# Local dev reads `.dev.vars` (see .dev.vars.example) instead.
+
+name = "commons"
+main = "src/worker/index.ts"
+compatibility_date = "2026-05-19"
+# The @agenticprimitives/* packages use WebCrypto and, transitively, a few Node shims.
+compatibility_flags = ["nodejs_compat"]
+
+[assets]
+directory = "./dist/client"
+binding = "ASSETS"
+# `none` on purpose: an unmatched path falls through to the WORKER, which then decides between an
+# API route and the SPA shell. Letting the asset server answer everything with index.html would
+# make `/api/typo` return HTML with a 200 — a bug that reads like a parse error for weeks.
+not_found_handling = "none"
+
+[observability]
+enabled = true
+
+[dev]
+port = 8799
+
+[vars]
+# ── Who this app is at the Home ───────────────────────────────────────────────────────────────
+# `CLIENT_ID` must be registered at the Home, and `REDIRECT_URI` must be an EXACT match for one
+# of the redirect URIs registered against it. Not a prefix — exact (CN-1). A mismatch shows the
+# person "Request blocked" at the Home, which is the allowlist working, not a bug.
+CLIENT_ID = "commons-app"
+REDIRECT_URI = "http://localhost:8799/"
+
+# The person's Home. Named people live at `<label>.impact-agent.me`; everyone else starts here.
+HOME_ORIGIN = "https://www.impact-agent.me"
+HOME_ZONE = "impact-agent.me"
+
+# The relying-site DELEGATE — the backend account the Home scopes its grant TO. A delegate, never
+# a custodian (ADR-0019). The Home uses its own registered value and treats this as a hint.
+DELEGATE = "0x89D13c596c45E4eE80Af5ae06C727FE9A820ffD0"
+
+# ── The live rails ────────────────────────────────────────────────────────────────────────────
+# The A2A worker: identity, delegation, and the interactions rail (topics, messages, library).
+A2A_BASE = "https://demo-a2a-production.richardpedersen3.workers.dev"
+
+CHAIN_ID = "84532"
+
+[env.production]
+workers_dev = true
+
+# SAME-ACCOUNT DEPLOY ⇒ SERVICE BINDING, NOT A URL.
+#
+# Cloudflare forbids a Worker fetching a sibling `*.workers.dev` URL on the same account (error
+# 1042), and this app is deployed alongside the rails. `A2A_BASE` stays set because it is what the
+# client builds paths against; the binding is what actually carries the request. `buildConfig`
+# selects the binding when it is present — once, at startup, not per call.
+#
+# Deploying to a DIFFERENT account? Delete this block. The public URL then works and needs nothing.
+[[env.production.services]]
+binding = "A2A"
+service = "demo-a2a-production"
+
+[env.production.vars]
+CLIENT_ID = "commons-app"
+# Must EXACTLY match a redirect URI registered for `commons-app` at the Home — trailing slash
+# included (CN-1). Register yours at https://www.impact-agent.me/developer.
+#
+# NOTE the `-production` suffix: `wrangler deploy --env production` names the Worker
+# `<name>-<env>`, so the deployed origin is NOT `commons.workers.dev`. Getting this wrong shows
+# the person "Request blocked" at the Home, which reads like a bug and is the allowlist working.
+REDIRECT_URI = "https://commons-production.richardpedersen3.workers.dev/"
+HOME_ORIGIN = "https://www.impact-agent.me"
+HOME_ZONE = "impact-agent.me"
+DELEGATE = "0x89D13c596c45E4eE80Af5ae06C727FE9A820ffD0"
+A2A_BASE = "https://demo-a2a-production.richardpedersen3.workers.dev"
+CHAIN_ID = "84532"
