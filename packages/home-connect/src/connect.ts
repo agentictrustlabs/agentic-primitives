@@ -17,6 +17,11 @@
 //   · the live A2A worker is origin-locked, so your server is the only thing that can call it.
 
 import { createConnectClient, type ConnectClient } from '@agenticprimitives/connect-client';
+import {
+  connectAsQuickConnect,
+  listQuickConnect,
+  type QuickConnectIdentity,
+} from '@agenticprimitives/connect-client';
 import type { Address } from '@agenticprimitives/types';
 import { asDelegationWire, type DelegationWire } from './delegation.js';
 import { HomeConnectError } from './errors.js';
@@ -164,6 +169,29 @@ export interface HomeConnect {
    * only for the person whose token you present.
    */
   listRelatedOrgs(idToken: string, authOrigin: string): Promise<RelatedOrg[]>;
+  /**
+   * Pre-custodied identities this Home offers, or `[]`.
+   *
+   * A Home MAY hold the custodian for a handful of shared accounts so an app can connect as a
+   * real on-chain Smart Agent — real vault, real orgs, real signatures — without a credential
+   * ceremony. It is a genuine authority chain, not a mock, which is what makes it worth testing
+   * against.
+   *
+   * GATED BY THE HOME, NEVER BY THE APP. An empty list is the answer for a Home that offers none,
+   * an origin that is not a Home, and an unreachable network alike — so the affordance disappears
+   * everywhere at once and no app ships its own flag or its own hardcoded list.
+   *
+   * Never throws: deciding whether to show a control must not be able to break a page.
+   */
+  listDemoIdentities(): Promise<QuickConnectIdentity[]>;
+  /**
+   * Connect as one of them. THROWS on failure — a person clicked something, so silence would be
+   * a button that did nothing.
+   *
+   * The result is an ordinary sign-in: an `id_token` whose subject is that PERSON, plus the site
+   * delegation. This app holds no key at any point.
+   */
+  connectAsDemo(handle: string): Promise<ConnectResult>;
   /** Decode without verifying — for logging only. Trust comes from `completeConnect`. */
   decodeIdToken(idToken: string): PersonClaims;
   /** The person's SA from a token's `sub` / `canonical_agent_id`. */
@@ -314,6 +342,41 @@ export function createHomeConnect(config: HomeConnectConfig): HomeConnect {
       } finally {
         clearTimeout(timer);
       }
+    },
+
+    listDemoIdentities: () =>
+      listQuickConnect({ homeOrigin: policy.apex, clientId: config.clientId }),
+
+    async connectAsDemo(handle) {
+      const session = await connectAsQuickConnect(
+        { homeOrigin: policy.apex, clientId: config.clientId },
+        handle,
+      );
+      // VERIFIED LIKE ANY OTHER TOKEN. It arrived over a different route, so it would be easy to
+      // treat as pre-trusted — but the signature, issuer and expiry checks are exactly what make
+      // it a session, and skipping them because of how it was requested is how a "demo path"
+      // becomes a hole. No nonce here: this flow has no authorize leg to bind one to.
+      const claims = await client.verifyIdToken(policy.apex, session.idToken, '');
+      const subject = (claims.canonical_agent_id ?? claims.sub ?? '')
+        .match(/0x[0-9a-fA-F]{40}$/)?.[0]
+        ?.toLowerCase() as Address | undefined;
+      if (!subject) throw new HomeConnectError('no_agent_in_token', 'quick connect returned no Smart Agent');
+
+      return {
+        idToken: session.idToken,
+        claims,
+        subject,
+        // A quick connect signs in AS THE PERSON — the delegation it returns is person → delegate,
+        // the same shape `site-login` produces.
+        subjectKind: 'person',
+        person: subject,
+        ...(session.agentName ? { agentName: session.agentName } : {}),
+        ...((): { delegation?: DelegationWire } => {
+          const d = asDelegationWire(session.delegation);
+          return d ? { delegation: d } : {};
+        })(),
+        authOrigin: policy.apex,
+      };
     },
 
     decodeIdToken: (idToken) => client.decodeIdToken(idToken),

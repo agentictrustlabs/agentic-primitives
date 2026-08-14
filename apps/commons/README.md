@@ -49,6 +49,24 @@ somebody else's, and the live rails are origin-locked so a cross-origin call fai
 | `src/worker/orgs.ts` | Fetching org stewardship wires, and why the cache is 60 seconds |
 | `src/ui/views/parts.tsx` | Rendering a refusal as a ceremony rather than an error |
 
+## Test identities
+
+The connect screen carries a collapsed pane listing the pre-custodied identities the Home offers
+(`/connect/demo-personas`). Connecting as one is an ordinary sign-in — same verification, same
+session cookie, same version — against a real on-chain Smart Agent whose custodian the Home holds.
+Not a demo mode: an app with a second, weaker session path is an app whose real path is untested.
+
+**Gated by the Home, not by this app.** `listDemoIdentities()` returns `[]` when the Home offers
+none, and the pane does not render. No flag ships here, and no list is hardcoded — an app that
+hardcoded one would defeat the gate.
+
+Collapsed by default and never auto-opened: anyone who opens it can act as those accounts.
+
+What works as one, verified end to end: sign-in, identity, messaging, and the chain panel.
+**Discussion and the library do not** until a community is connected *in this app* — that ceremony
+runs at the Home, and shared accounts have no keyless route into it, so it needs a browser sign-in
+there first.
+
 ## Configuration
 
 `wrangler.toml` `[vars]`:

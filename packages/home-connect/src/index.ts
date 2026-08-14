@@ -22,6 +22,8 @@ export {
   type RelatedOrg,
 } from './connect.js';
 
+export type { QuickConnectIdentity } from '@agenticprimitives/connect-client';
+
 export {
   resolveHomeOrigin,
   isAllowedHomeOrigin,

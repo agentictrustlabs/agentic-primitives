@@ -307,6 +307,64 @@ app.post('/api/connect/callback', async (c) => {
   }
 });
 
+/**
+ * Identities this Home offers for a keyless sign-in, or `[]`.
+ *
+ * Whether this app shows the affordance at all is the HOME's decision, not a flag here: a Home
+ * that offers none returns an empty list and the pane never renders. That is why this route
+ * forwards the question instead of answering it from config.
+ */
+app.get('/api/connect/demo', async (c) => {
+  const cfg = c.get('cfg');
+  const identities = await cfg.connect.listDemoIdentities();
+  return c.json({
+    identities: identities.map((i) => ({
+      handle: i.handle,
+      name: i.name,
+      sa: i.sa,
+      blurb: i.blurb,
+      // The organizations they custody — the reason one persona is more useful than another for
+      // exercising discussion and the library.
+      custodies: (i.custodies ?? []).map((o) => ({ sa: o.sa, name: o.name ?? o.sa })),
+    })),
+  });
+});
+
+/**
+ * Sign in as one of them.
+ *
+ * The result is an ordinary person session — same verification, same cookie, same version. It is
+ * deliberately NOT a separate "demo mode": an app with a second, weaker session path would be an
+ * app whose real path is untested.
+ */
+app.post('/api/connect/demo', async (c) => {
+  const cfg = c.get('cfg');
+  try {
+    const { handle } = (await c.req.json().catch(() => ({}))) as { handle?: string };
+    if (!handle) return c.json({ error: 'handle is required' }, 400);
+
+    const result = await cfg.connect.connectAsDemo(handle);
+    const session: SessionData = {
+      v: SESSION_VERSION,
+      idToken: result.idToken,
+      person: result.subject,
+      agentName: result.agentName ?? null,
+      authOrigin: result.authOrigin,
+      exp: result.claims.exp,
+    };
+    forgetOrgs(session.person);
+    const ttl = Math.max(60, result.claims.exp - Math.floor(Date.now() / 1000));
+    const jar = cookieHeaders(c.req.url);
+    const headers = new Headers();
+    headers.append('set-cookie', jar.setSession(await seal(session, cfg.sessionSecret), ttl));
+    // Whoever was here before, their org receipt is not this person's.
+    headers.append('set-cookie', jar.clearOrg());
+    return c.json({ person: session.person, agentName: session.agentName }, { headers });
+  } catch (e) {
+    return toResponse(e, cfg);
+  }
+});
+
 app.post('/api/logout', (c) => {
   const jar = cookieHeaders(c.req.url);
   const headers = new Headers();
