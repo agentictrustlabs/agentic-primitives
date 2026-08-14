@@ -16,8 +16,22 @@ const COOKIE = 'commons_session';
 const PENDING_COOKIE = 'commons_pending';
 const ORG_COOKIE = 'commons_org';
 
+/**
+ * Bumped when a stored session's MEANING changes, not merely its shape.
+ *
+ * v1 sessions were written from whatever `sub` the callback token carried — which for an
+ * `org-create` ceremony is the ORGANIZATION, not the person. Those cookies name the wrong agent
+ * as `person`, and every call made with one acts as the org. There is no way to repair that from
+ * the cookie alone (the token cannot say who the person is), so they are rejected and the person
+ * signs in again, which takes one click and yields a correct session.
+ */
+export const SESSION_VERSION = 2;
+
 export interface SessionData {
+  /** See `SESSION_VERSION`. Absent or lower ⇒ not a session. */
+  v?: number;
   idToken: string;
+  /** The PERSON's Smart Agent address. Never an organization — see the callback in index.ts. */
   person: string;
   agentName: string | null;
   authOrigin: string;
@@ -146,6 +160,9 @@ export function cookieHeaders(url: string) {
 export async function readSession(request: Request, secret: string): Promise<SessionData | null> {
   const s = await open<SessionData>(readCookie(request.headers.get('cookie'), COOKIE), secret);
   if (!s?.idToken || !s.person) return null;
+  // A session from before the subject/person split named an organization as the person. Rejecting
+  // it is the only honest move: it decrypts fine and is wrong, which is the worst combination.
+  if ((s.v ?? 1) < SESSION_VERSION) return null;
   // The token's own expiry, honoured here so a dead token fails at our door with a clear
   // "reconnect" rather than as an opaque 401 from three hops away.
   if (typeof s.exp === 'number' && s.exp * 1000 <= Date.now()) return null;

@@ -65,6 +65,10 @@ export interface ConnectStart {
   codeVerifier: string;
   /** The Home origin this flow was started against. */
   authOrigin: string;
+  /**
+   * Which ceremony this was. Load-bearing on the way back — see `ConnectResult.subject`.
+   */
+  template: ConnectTemplate;
 }
 
 /** The org identity a `org-create` ceremony returns, including the credential that matters. */
@@ -91,8 +95,27 @@ export interface ConnectResult {
   /** The Home-signed OIDC token. Bearer credential — server-side only, short-lived. */
   idToken: string;
   claims: PersonClaims;
-  /** The person's canonical Smart Agent address. This, not the name, is the identifier. */
-  person: Address;
+  /**
+   * The Smart Agent this token's `sub` names — WHICH IS NOT ALWAYS THE PERSON.
+   *
+   * The Home mints `sub` from the DELEGATOR of the delegation the ceremony submitted:
+   *
+   *   site-login  → the delegation is person → your delegate, so `sub` is the PERSON.
+   *   org-create  → the delegation is org → your delegate, so `sub` is the ORGANIZATION.
+   *
+   * Treating an `org-create` token as a person session is a silent identity swap: every later
+   * call acts as the organization, `related-orgs` looks up links that are filed under the person
+   * and finds none, and the org's own stewardship wire — which names the PERSON as its delegate —
+   * stops verifying. Read `subject` with `subjectKind`, never on its own.
+   */
+  subject: Address;
+  /** What `subject` actually is, decided by the template rather than inferred. */
+  subjectKind: 'person' | 'organization';
+  /**
+   * The person, when this token names one. Undefined after `org-create` — that ceremony's token
+   * cannot tell you who the person is, and guessing is how the swap happens.
+   */
+  person?: Address;
   /** The person's claimed agent name, when they have one. */
   agentName?: string;
   /** The scoped delegation the Home issued to your `delegate` (authority, not identity). */
@@ -184,6 +207,7 @@ export function createHomeConnect(config: HomeConnectConfig): HomeConnect {
         nonce: start.nonce,
         codeVerifier: start.codeVerifier,
         authOrigin: start.authOrigin,
+        template,
       };
     },
 
@@ -236,10 +260,18 @@ export function createHomeConnect(config: HomeConnectConfig): HomeConnect {
             }
           : undefined;
 
+      // The template decides what the subject IS. Not a heuristic on the address, and not an
+      // assumption — the Home's rule is documented and deterministic.
+      const subjectKind: 'person' | 'organization' =
+        start.template === 'org-create' ? 'organization' : 'person';
+      const subject = person.toLowerCase() as Address;
+
       return {
         idToken: tok.idToken,
         claims,
-        person: person.toLowerCase() as Address,
+        subject,
+        subjectKind,
+        ...(subjectKind === 'person' ? { person: subject } : {}),
         ...(claims.agent_name ? { agentName: claims.agent_name } : {}),
         ...((): { delegation?: DelegationWire } => {
           const d = asDelegationWire(tok.delegation);

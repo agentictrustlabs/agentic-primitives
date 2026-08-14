@@ -25,6 +25,7 @@ import {
   readPending,
   readSession,
   seal,
+  SESSION_VERSION,
   type CeremonyOrg,
   type SessionData,
 } from './session.js';
@@ -209,6 +210,8 @@ app.post('/api/connect/callback', async (c) => {
     if (!pending) {
       return c.json({ error: 'no connect in progress — start again', code: 'state_mismatch' }, 400);
     }
+    const existing = c.get('session');
+
     const result = await cfg.connect.completeConnect({
       start: {
         url: '',
@@ -216,58 +219,86 @@ app.post('/api/connect/callback', async (c) => {
         nonce: pending.nonce,
         codeVerifier: pending.codeVerifier,
         authOrigin: pending.authOrigin,
+        template: pending.template,
       },
       code,
       state,
     });
 
-    // A fresh org from an `org-create` ceremony invalidates whatever we cached a moment ago.
-    forgetOrgs(result.person);
+    const jar = cookieHeaders(c.req.url);
+    const headers = new Headers();
+    headers.append('set-cookie', jar.clearPending());
 
+    /*
+      AN org-create TOKEN IS NOT A PERSON SESSION.
+
+      The Home mints `sub` from the DELEGATOR of the delegation the ceremony submitted. For
+      `site-login` that is the person; for `org-create` the submitted grant is org → delegate, so
+      the subject is the ORGANIZATION.
+
+      Storing it as the session was a silent identity swap, and it produced exactly the symptoms
+      it should: `related-orgs` looked up links filed under the person while we asked as the org
+      and got none, and `channels.*` refused because the org's stewardship wire names the PERSON
+      as its delegate — so the caller was neither member nor steward of itself.
+
+      So this branch adopts the ORGANIZATION and leaves the session alone.
+    */
+    if (result.subjectKind === 'organization') {
+      // No person session to attach it to. Refusing beats inventing one from a token that cannot
+      // say who the person is.
+      if (!existing) {
+        return c.json(
+          {
+            error: 'sign in with your Home before connecting a community',
+            code: 'session_required',
+          },
+          409,
+        );
+      }
+      const ceremony: CeremonyOrg = {
+        address: result.subject,
+        name: result.org?.orgName || result.agentName || 'Organization',
+        ...(result.org?.stewardshipDelegation ? { stewardship: result.org.stewardshipDelegation } : {}),
+        at: Date.now(),
+      };
+      const ttl = Math.max(60, existing.exp - Math.floor(Date.now() / 1000));
+      const cookie = jar.setOrg(await seal(ceremony, cfg.sessionSecret), ttl);
+      if (cookie) headers.append('set-cookie', cookie);
+      forgetOrgs(existing.person);
+      return c.json(
+        {
+          person: existing.person,
+          agentName: existing.agentName,
+          org: { address: ceremony.address, name: ceremony.name },
+          orgStored: cookie ? 'stored' : 'too-large',
+          stewardship: !!ceremony.stewardship,
+        },
+        { headers },
+      );
+    }
+
+    // ── site-login: the subject IS the person, so this establishes the session. ──
+    forgetOrgs(result.subject);
     const session: SessionData = {
+      v: SESSION_VERSION,
       idToken: result.idToken,
-      person: result.person,
+      person: result.subject,
       agentName: result.agentName ?? null,
       authOrigin: result.authOrigin,
       exp: result.claims.exp,
     };
     const ttl = Math.max(60, result.claims.exp - Math.floor(Date.now() / 1000));
-    const jar = cookieHeaders(c.req.url);
-    const headers = new Headers();
     headers.append('set-cookie', jar.setSession(await seal(session, cfg.sessionSecret), ttl));
-    headers.append('set-cookie', jar.clearPending());
-
-    // KEEP THE CEREMONY'S ORG. It arrives with its stewardship delegation and is true the moment
-    // the person finishes; the Home's `related-orgs` projection is written by another service and
-    // may not answer yet. Discarding this in favour of that is how somebody who just connected a
-    // community gets told they have none.
-    let orgStored: 'stored' | 'too-large' | 'none' = 'none';
-    if (result.org?.orgAgent) {
-      const ceremony: CeremonyOrg = {
-        address: String(result.org.orgAgent).toLowerCase(),
-        name: result.org.orgName || 'Organization',
-        ...(result.org.stewardshipDelegation ? { stewardship: result.org.stewardshipDelegation } : {}),
-        at: Date.now(),
-      };
-      const cookie = jar.setOrg(await seal(ceremony, cfg.sessionSecret), ttl);
-      if (cookie) {
-        headers.append('set-cookie', cookie);
-        orgStored = 'stored';
-      } else {
-        // Oversized cookies are dropped silently by browsers, so this is reported rather than
-        // attempted-and-hoped. The Home's list still carries the org once it catches up.
-        orgStored = 'too-large';
-      }
-    }
+    // A different person signed in ⇒ the previous org receipt is not theirs.
+    if (existing && existing.person !== session.person) headers.append('set-cookie', jar.clearOrg());
 
     return c.json(
       {
-        person: result.person,
-        agentName: result.agentName ?? null,
-        org: result.org ? { address: result.org.orgAgent, name: result.org.orgName } : null,
-        // Surfaced so a failed ceremony is distinguishable from one whose org we could not keep.
-        orgStored,
-        stewardship: !!result.org?.stewardshipDelegation,
+        person: session.person,
+        agentName: session.agentName,
+        org: null,
+        orgStored: 'none',
+        stewardship: false,
       },
       { headers },
     );
@@ -670,8 +701,12 @@ app.get('/api/diagnostics', async (c) => {
 
     return c.json({
       you: {
+        // This MUST be the person, never an organization. If it matches `ceremonyOrg.address`,
+        // an org-create token was stored as the session — the exact defect v2 of the cookie
+        // exists to end. Reverse-resolve it on Basescan if it looks wrong.
         person: session.person,
         agentName: session.agentName,
+        sessionVersion: SESSION_VERSION,
         // WHICH Home issued this token — a named person signs in at their own subdomain, so
         // this is often not the origin the app sent them to, and every read above uses it.
         authOrigin: session.authOrigin,
@@ -680,7 +715,13 @@ app.get('/api/diagnostics', async (c) => {
       thisApp: { clientId: cfg.clientId, redirectUri: cfg.redirectUri, a2aBase: cfg.a2aBase },
       // The receipt from the last org-create, if we still hold it.
       ceremonyOrg: ceremony
-        ? { address: ceremony.address, name: ceremony.name, hasStewardship: !!ceremony.stewardship }
+        ? {
+            address: ceremony.address,
+            name: ceremony.name,
+            hasStewardship: !!ceremony.stewardship,
+            // A true here is the identity swap, stated rather than left to be spotted.
+            sameAsPerson: ceremony.address.toLowerCase() === session.person.toLowerCase(),
+          }
         : null,
       relatedOrgs: { scopedToThisApp: summarize(scoped), personsOwnView: summarize(unscoped) },
     });
