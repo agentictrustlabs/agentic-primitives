@@ -45,8 +45,12 @@ const DELEGATION_MANAGER = CONTRACTS.delegationManager ?? '';
 // Refusals from the substrate are typed and often name a CEREMONY the person can complete at
 // their Home. Passing them through as "500 internal error" would be the single worst thing this
 // app could do: it turns a two-click fix into an unexplained outage.
-function toResponse(e: unknown, cfg: AppConfig | null): Response {
-  const home = cfg ? homeCeremonyUrls(cfg.homeOrigin) : null;
+function toResponse(e: unknown, cfg: AppConfig | null, ctx: { org?: string } = {}): Response {
+  // `return` sends the person straight back here once the ceremony finishes, and `org` makes the
+  // Home provision that organization's grants too — without it, a steward enables only their own.
+  const home = cfg
+    ? homeCeremonyUrls(cfg.homeOrigin, { returnTo: cfg.redirectUri, ...(ctx.org ? { org: ctx.org } : {}) })
+    : null;
   if (e instanceof ConfigError) {
     return Response.json({ error: e.message, code: 'misconfigured' }, { status: 500 });
   }
@@ -55,7 +59,7 @@ function toResponse(e: unknown, cfg: AppConfig | null): Response {
       e.code === 'storage_not_enabled'
         ? (home?.enableStorage ?? undefined)
         : e.code === 'messaging_not_approved'
-          ? (home?.enableMessaging ?? undefined)
+          ? (home?.approveMessaging ?? undefined)
           : e.code === 'read_grant'
             ? (home?.connectedApps ?? undefined)
             : undefined;
@@ -166,7 +170,7 @@ app.get('/api/me', async (c) => {
       authOrigin: session.authOrigin,
       storage: { granted: storage.granted, current: storage.current },
     };
-    return c.json({ me, home: homeCeremonyUrls(cfg.homeOrigin) });
+    return c.json({ me, home: homeCeremonyUrls(cfg.homeOrigin, { returnTo: cfg.redirectUri }) });
   } catch (e) {
     return toResponse(e, cfg);
   }
@@ -314,9 +318,10 @@ app.get('/api/orgs', async (c) => {
 // ── Discussion ────────────────────────────────────────────────────────────────────────────────
 app.get('/api/topics', async (c) => {
   const cfg = c.get('cfg');
+  const orgForCeremony = c.req.query('org') ?? '';
   try {
     const session = required(c.get('session'));
-    const org = c.req.query('org') ?? '';
+    const org = orgForCeremony;
     const listing = await cfg.interactions.listTopics(org, await orgAuth(cfg, c, session, org));
     return c.json({
       topics: listing.topics.map((t) => ({
@@ -329,12 +334,13 @@ app.get('/api/topics', async (c) => {
       steward: listing.steward,
     });
   } catch (e) {
-    return toResponse(e, cfg);
+    return toResponse(e, cfg, { org: orgForCeremony });
   }
 });
 
 app.post('/api/topics', async (c) => {
   const cfg = c.get('cfg');
+  let orgForCeremony = '';
   try {
     const session = required(c.get('session'));
     const body = (await c.req.json().catch(() => ({}))) as {
@@ -343,6 +349,7 @@ app.post('/api/topics', async (c) => {
       participationPolicy?: 'open' | 'restricted';
     };
     const org = body.org ?? '';
+    orgForCeremony = org;
     const title = String(body.title ?? '').trim();
     if (!title) return c.json({ error: 'title is required' }, 400);
     const r = await cfg.interactions.createTopic(
@@ -352,29 +359,32 @@ app.post('/api/topics', async (c) => {
     );
     return c.json(r);
   } catch (e) {
-    return toResponse(e, cfg);
+    return toResponse(e, cfg, { org: orgForCeremony });
   }
 });
 
 app.get('/api/topics/:id', async (c) => {
   const cfg = c.get('cfg');
+  const orgForCeremony = c.req.query('org') ?? '';
   try {
     const session = required(c.get('session'));
-    const org = c.req.query('org') ?? '';
+    const org = orgForCeremony;
     const topic = await cfg.interactions.readTopic(org, c.req.param('id'), await orgAuth(cfg, c, session, org));
     if (!topic) return c.json({ error: 'no such topic' }, 404);
     return c.json({ topic });
   } catch (e) {
-    return toResponse(e, cfg);
+    return toResponse(e, cfg, { org: orgForCeremony });
   }
 });
 
 app.post('/api/topics/:id/posts', async (c) => {
   const cfg = c.get('cfg');
+  let orgForCeremony = '';
   try {
     const session = required(c.get('session'));
     const body = (await c.req.json().catch(() => ({}))) as { org?: string; text?: string };
     const org = body.org ?? '';
+    orgForCeremony = org;
     const text = String(body.text ?? '').trim();
     if (!text) return c.json({ error: 'text is required' }, 400);
     const r = await cfg.interactions.postToTopic(
@@ -384,19 +394,20 @@ app.post('/api/topics/:id/posts', async (c) => {
     );
     return c.json(r);
   } catch (e) {
-    return toResponse(e, cfg);
+    return toResponse(e, cfg, { org: orgForCeremony });
   }
 });
 
 app.get('/api/members', async (c) => {
   const cfg = c.get('cfg');
+  const orgForCeremony = c.req.query('org') ?? '';
   try {
     const session = required(c.get('session'));
-    const org = c.req.query('org') ?? '';
+    const org = orgForCeremony;
     const members = await cfg.interactions.listMembers(org, await orgAuth(cfg, c, session, org));
     return c.json({ members });
   } catch (e) {
-    return toResponse(e, cfg);
+    return toResponse(e, cfg, { org: orgForCeremony });
   }
 });
 
@@ -409,7 +420,7 @@ app.get('/api/messaging', async (c) => {
     return c.json({
       wirePresent: status.wirePresent,
       recipients: status.recipients,
-      approveUrl: homeCeremonyUrls(cfg.homeOrigin).enableMessaging,
+      approveUrl: homeCeremonyUrls(cfg.homeOrigin).approveMessaging,
     });
   } catch (e) {
     return toResponse(e, cfg);
@@ -496,9 +507,10 @@ app.get('/api/inbox', async (c) => {
 // ── Library ───────────────────────────────────────────────────────────────────────────────────
 app.get('/api/library', async (c) => {
   const cfg = c.get('cfg');
+  const orgForCeremony = c.req.query('org') ?? '';
   try {
     const session = required(c.get('session'));
-    const org = c.req.query('org') ?? '';
+    const org = orgForCeremony;
     const catalog = await cfg.interactions.listLibrary(org, await orgAuth(cfg, c, session, org));
     const entries: LibraryEntry[] = catalog.map((a) => ({
       id: a.id,
@@ -512,15 +524,16 @@ app.get('/api/library', async (c) => {
     }));
     return c.json({ entries });
   } catch (e) {
-    return toResponse(e, cfg);
+    return toResponse(e, cfg, { org: orgForCeremony });
   }
 });
 
 app.get('/api/library/:id', async (c) => {
   const cfg = c.get('cfg');
+  const orgForCeremony = c.req.query('org') ?? '';
   try {
     const session = required(c.get('session'));
-    const org = c.req.query('org') ?? '';
+    const org = orgForCeremony;
     const record = await cfg.interactions.readArtifact(org, c.req.param('id'), await orgAuth(cfg, c, session, org));
     if (!record) return c.json({ error: 'no such artifact' }, 404);
     const b64 = typeof record.bytesB64 === 'string' ? record.bytesB64 : '';
@@ -535,12 +548,13 @@ app.get('/api/library/:id', async (c) => {
       storedCommitment: typeof record.commitment === 'string' ? record.commitment : null,
     });
   } catch (e) {
-    return toResponse(e, cfg);
+    return toResponse(e, cfg, { org: orgForCeremony });
   }
 });
 
 app.post('/api/library', async (c) => {
   const cfg = c.get('cfg');
+  let orgForCeremony = '';
   try {
     const session = required(c.get('session'));
     const body = (await c.req.json().catch(() => ({}))) as {
@@ -551,6 +565,7 @@ app.post('/api/library', async (c) => {
       text?: string;
     };
     const org = body.org ?? '';
+    orgForCeremony = org;
     const name = String(body.name ?? '').trim();
     const text = String(body.text ?? '');
     if (!name) return c.json({ error: 'name is required' }, 400);
@@ -579,19 +594,20 @@ app.post('/api/library', async (c) => {
     );
     return c.json({ artifactId: id });
   } catch (e) {
-    return toResponse(e, cfg);
+    return toResponse(e, cfg, { org: orgForCeremony });
   }
 });
 
 app.delete('/api/library/:id', async (c) => {
   const cfg = c.get('cfg');
+  const orgForCeremony = c.req.query('org') ?? '';
   try {
     const session = required(c.get('session'));
-    const org = c.req.query('org') ?? '';
+    const org = orgForCeremony;
     await cfg.interactions.deleteArtifact(org, c.req.param('id'), await orgAuth(cfg, c, session, org));
     return c.json({ ok: true });
   } catch (e) {
-    return toResponse(e, cfg);
+    return toResponse(e, cfg, { org: orgForCeremony });
   }
 });
 

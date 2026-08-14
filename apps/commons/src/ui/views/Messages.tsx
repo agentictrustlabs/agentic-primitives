@@ -86,14 +86,39 @@ export function Messages() {
 
   return (
     <>
+      {/* NOT a blocking notice, and no longer shown before anything is attempted.
+          The wire is approved PER COUNTERPARTY, so "not approved yet" up front cannot be acted on
+          — there is no recipient to approve. It becomes actionable only after a send is refused,
+          where the refusal names them. Leading with an alarm and a link that cannot fix it is the
+          dead end this replaces. */}
       {state && !state.wirePresent && (
-        <CeremonyNotice
-          url={state.approveUrl}
-          title="Messaging is not approved yet"
-          body="Approving your agent to send on your behalf takes your own credential, which lives at your Home and never here. One signature, once per new contact."
-        />
+        <p className="muted" style={{ marginBottom: 12, fontSize: 13 }}>
+          Your agent has no messaging approvals yet. You approve one contact at a time, with your own
+          credential — send below and it will tell you exactly who to approve.
+        </p>
       )}
-      {error && <ErrorLine error={error} onDismiss={() => setError(null)} />}
+      {/* A refused send names the counterparty, which is the whole reason this is one click and
+          not a scavenger hunt. The reference Home offers the approval INLINE beside a send in its
+          own Messages view — there is no standalone route to link at — so the instruction says
+          where to go rather than pretending a button here could sign it. */}
+      {error?.code === 'messaging_not_approved' ? (
+        <div className="notice" style={{ marginBottom: 14 }}>
+          <strong>Approve {to.trim() || 'this contact'} first</strong>
+          <p style={{ margin: '4px 0 8px' }}>
+            Letting your agent message someone is a standing authority you sign once, per contact, with
+            your own credential — which lives at your Home and never here. Open your Home&apos;s Messages,
+            send to <code>{to.trim() || 'them'}</code> once and approve when it asks. Sending from here
+            works afterwards; the approval lives with your agent, not with this app.
+          </p>
+          {error.ceremonyUrl && (
+            <a href={error.ceremonyUrl} target="_blank" rel="noreferrer">
+              Open Messages at your Home →
+            </a>
+          )}
+        </div>
+      ) : (
+        error && <ErrorLine error={error} onDismiss={() => setError(null)} />
+      )}
 
       <div className="panel">
         <h2>Send a message</h2>

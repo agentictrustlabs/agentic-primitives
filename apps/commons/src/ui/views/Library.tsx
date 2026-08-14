@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import type { LibraryEntry, OrgSummary } from '../../shared/api-types.js';
 import { api, CommonsError } from '../api.js';
-import { Empty, ErrorLine } from './parts.js';
+import { Empty, ErrorLine, NotAuthorizedNotice } from './parts.js';
 
 interface ArtifactView {
   artifact: Record<string, unknown>;
@@ -94,7 +94,11 @@ export function Library({ org }: { org: OrgSummary | null }) {
 
   return (
     <>
-      {error && <ErrorLine error={error} onDismiss={() => setError(null)} />}
+      {error?.code === 'not_authorized' ? (
+        <NotAuthorizedNotice orgName={org.name} steward={org.steward} />
+      ) : (
+        error && <ErrorLine error={error} onDismiss={() => setError(null)} />
+      )}
 
       <div className="panel">
         <h2>{org.name} library</h2>

@@ -88,10 +88,35 @@ export function buildConfig(env: Env): AppConfig {
   };
 }
 
-/** Where a person goes to enable interactions storage for themselves or an org they steward. */
-export const homeCeremonyUrls = (homeOrigin: string) => ({
-  enableStorage: `${homeOrigin}/you`,
-  enableMessaging: `${homeOrigin}/enable-messaging`,
-  organizations: `${homeOrigin}/organizations`,
-  connectedApps: `${homeOrigin}/apps`,
-});
+/**
+ * Where a person goes to complete each ceremony this app cannot perform.
+ *
+ * These are not interchangeable, and getting them wrong sends somebody to a page that cannot fix
+ * what they are looking at — which is worse than showing no link at all.
+ *
+ * `enableStorage` → `/enable-messaging`, despite the name. That page force-provisions the two
+ * grants the vault path needs — the interactions grant and the inbox-delivery grant — for the
+ * person AND every organization they steward. It takes `?return=` (must be a registered relying
+ * origin) and `?org=` to include a specific organization. It is the answer to
+ * `no interactions grant`.
+ *
+ * `approveMessaging` → `/messages`. The outbound messaging WIRE is a different artifact, and its
+ * ceremony is per-counterparty: the person approves a named recipient, once. The reference Home
+ * offers that prompt INLINE beside a refused send in its own messaging UI — there is no standalone
+ * route to link at, so the honest instruction is "message them once from your Home, approve there".
+ * The wire then lives with the person's agent, so sending from here works afterwards.
+ */
+export const homeCeremonyUrls = (homeOrigin: string, ctx: { returnTo?: string; org?: string } = {}) => {
+  const withCtx = (path: string): string => {
+    const u = new URL(path, homeOrigin);
+    if (ctx.returnTo) u.searchParams.set('return', ctx.returnTo);
+    if (ctx.org) u.searchParams.set('org', ctx.org);
+    return u.toString();
+  };
+  return {
+    enableStorage: withCtx('/enable-messaging'),
+    approveMessaging: `${homeOrigin}/messages`,
+    organizations: `${homeOrigin}/organizations`,
+    connectedApps: `${homeOrigin}/apps`,
+  };
+};

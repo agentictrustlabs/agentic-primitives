@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import type { OrgSummary, PostView, TopicSummary } from '../../shared/api-types.js';
 import { api, CommonsError } from '../api.js';
-import { Empty, ErrorLine } from './parts.js';
+import { Empty, ErrorLine, NotAuthorizedNotice } from './parts.js';
 
 /**
  * Discussion — topics and posts belonging to a community.
@@ -94,7 +94,11 @@ export function Discussion({ org }: { org: OrgSummary | null }) {
 
   return (
     <>
-      {error && <ErrorLine error={error} onDismiss={() => setError(null)} />}
+      {error?.code === 'not_authorized' ? (
+        <NotAuthorizedNotice orgName={org.name} steward={org.steward} />
+      ) : (
+        error && <ErrorLine error={error} onDismiss={() => setError(null)} />
+      )}
 
       <div className="panel">
         <h2>Topics in {org.name}</h2>
