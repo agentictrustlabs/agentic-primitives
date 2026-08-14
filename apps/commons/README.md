@@ -63,10 +63,17 @@ hardcoded one would defeat the gate.
 
 Collapsed by default and never auto-opened: anyone who opens it can act as those accounts.
 
-What works as one, verified end to end: sign-in, identity, messaging, and the chain panel.
-**Discussion and the library do not** until a community is connected *in this app* — that ceremony
-runs at the Home, and shared accounts have no keyless route into it, so it needs a browser sign-in
-there first.
+Quick connect happens server-side, so the browser has no session at the **Home** — and every link
+this app offers there (organizations, storage, messaging, connected apps, invitations) would land
+on a credential challenge for an account whose key the person does not hold.
+
+`connectAsQuickConnect` returns a `homeSession` for exactly that, and the Home accepts it back as a
+`#session=` **fragment** (`src/context/session.tsx`). A fragment, deliberately: it never reaches a
+server, a referrer, or an access log — which a query parameter would, on every hop. This app keeps
+that token server-side alongside the id_token and appends it only when building a Home link.
+
+With it, every surface works as a test identity — including connecting a community, which is what
+unlocks discussion and the library.
 
 ## Configuration
 

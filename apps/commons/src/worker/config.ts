@@ -106,18 +106,30 @@ export function buildConfig(env: Env): AppConfig {
  * route to link at, so the honest instruction is "message them once from your Home, approve there".
  * The wire then lives with the person's agent, so sending from here works afterwards.
  */
-export const homeCeremonyUrls = (homeOrigin: string, ctx: { returnTo?: string; org?: string } = {}) => {
+export const homeCeremonyUrls = (
+  homeOrigin: string,
+  ctx: { returnTo?: string; org?: string; homeSession?: string } = {},
+) => {
+  /**
+   * The `#session=` handoff the Home accepts (`src/context/session.tsx`).
+   *
+   * A FRAGMENT, not a query parameter — it never reaches a server, a referrer, or an access log.
+   * Appended only when this app actually holds a Home session for the person, which today means
+   * they signed in through the shared test identities; every other route leaves them signed in at
+   * their Home already.
+   */
+  const handoff = ctx.homeSession ? `#session=${encodeURIComponent(ctx.homeSession)}` : '';
   const withCtx = (path: string): string => {
     const u = new URL(path, homeOrigin);
     if (ctx.returnTo) u.searchParams.set('return', ctx.returnTo);
     if (ctx.org) u.searchParams.set('org', ctx.org);
-    return u.toString();
+    return u.toString() + handoff;
   };
   return {
     enableStorage: withCtx('/enable-messaging'),
-    approveMessaging: `${homeOrigin}/messages`,
-    organizations: `${homeOrigin}/organizations`,
-    connectedApps: `${homeOrigin}/apps`,
+    approveMessaging: `${homeOrigin}/messages${handoff}`,
+    organizations: `${homeOrigin}/organizations${handoff}`,
+    connectedApps: `${homeOrigin}/apps${handoff}`,
     /**
      * Where an invitation is actually issued.
      *
@@ -127,6 +139,6 @@ export const homeCeremonyUrls = (homeOrigin: string, ctx: { returnTo?: string; o
      * and holds no custody, so it cannot mint one and should not pretend to.
      */
     inviteToOrg: (org: string): string =>
-      `${homeOrigin}/org/${org.toLowerCase()}/invite`,
+      `${homeOrigin}/org/${org.toLowerCase()}/invite${handoff}`,
   };
 };

@@ -46,11 +46,19 @@ const DELEGATION_MANAGER = CONTRACTS.delegationManager ?? '';
 // Refusals from the substrate are typed and often name a CEREMONY the person can complete at
 // their Home. Passing them through as "500 internal error" would be the single worst thing this
 // app could do: it turns a two-click fix into an unexplained outage.
-function toResponse(e: unknown, cfg: AppConfig | null, ctx: { org?: string } = {}): Response {
+function toResponse(
+  e: unknown,
+  cfg: AppConfig | null,
+  ctx: { org?: string; homeSession?: string } = {},
+): Response {
   // `return` sends the person straight back here once the ceremony finishes, and `org` makes the
   // Home provision that organization's grants too — without it, a steward enables only their own.
   const home = cfg
-    ? homeCeremonyUrls(cfg.homeOrigin, { returnTo: cfg.redirectUri, ...(ctx.org ? { org: ctx.org } : {}) })
+    ? homeCeremonyUrls(cfg.homeOrigin, {
+        returnTo: cfg.redirectUri,
+        ...(ctx.org ? { org: ctx.org } : {}),
+        ...(ctx.homeSession ? { homeSession: ctx.homeSession } : {}),
+      })
     : null;
   if (e instanceof ConfigError) {
     return Response.json({ error: e.message, code: 'misconfigured' }, { status: 500 });
@@ -86,6 +94,17 @@ app.use('/api/*', async (c, next) => {
   c.set('session', await readSession(c.req.raw, cfg.sessionSecret));
   await next();
 });
+
+/**
+ * The Home-session handoff for whoever is signed in, if any.
+ *
+ * Read from the request rather than threaded through every call site, because a ceremony link is
+ * built at the point of failure and that is exactly where the session is least in scope.
+ */
+function handoffOf(c: { get: (k: 'session') => SessionData | null }): { homeSession?: string } {
+  const s = c.get('session');
+  return s?.homeSession ? { homeSession: s.homeSession } : {};
+}
 
 /** Every route below this needs a connected person. */
 function required(session: SessionData | null): SessionData {
@@ -171,9 +190,15 @@ app.get('/api/me', async (c) => {
       authOrigin: session.authOrigin,
       storage: { granted: storage.granted, current: storage.current },
     };
-    return c.json({ me, home: homeCeremonyUrls(cfg.homeOrigin, { returnTo: cfg.redirectUri }) });
+    return c.json({
+      me,
+      home: homeCeremonyUrls(cfg.homeOrigin, {
+        returnTo: cfg.redirectUri,
+        ...(session.homeSession ? { homeSession: session.homeSession } : {}),
+      }),
+    });
   } catch (e) {
-    return toResponse(e, cfg);
+    return toResponse(e, cfg, handoffOf(c));
   }
 });
 
@@ -197,7 +222,7 @@ app.post('/api/connect/start', async (c) => {
       { headers: { 'set-cookie': cookieHeaders(c.req.url).setPending(pending) } },
     );
   } catch (e) {
-    return toResponse(e, cfg);
+    return toResponse(e, cfg, handoffOf(c));
   }
 });
 
@@ -303,7 +328,7 @@ app.post('/api/connect/callback', async (c) => {
       { headers },
     );
   } catch (e) {
-    return toResponse(e, cfg);
+    return toResponse(e, cfg, handoffOf(c));
   }
 });
 
@@ -350,6 +375,10 @@ app.post('/api/connect/demo', async (c) => {
       person: result.subject,
       agentName: result.agentName ?? null,
       authOrigin: result.authOrigin,
+      // Kept so the Home links this app offers actually sign the person in there. A quick connect
+      // happens server-side, so without it the browser has no Home session and every one of those
+      // links is a credential challenge for an account whose key they do not hold.
+      ...(result.homeSession ? { homeSession: result.homeSession } : {}),
       exp: result.claims.exp,
     };
     forgetOrgs(session.person);
@@ -361,7 +390,7 @@ app.post('/api/connect/demo', async (c) => {
     headers.append('set-cookie', jar.clearOrg());
     return c.json({ person: session.person, agentName: session.agentName }, { headers });
   } catch (e) {
-    return toResponse(e, cfg);
+    return toResponse(e, cfg, handoffOf(c));
   }
 });
 
@@ -400,7 +429,7 @@ app.get('/api/orgs', async (c) => {
     );
     return c.json({ orgs: out });
   } catch (e) {
-    return toResponse(e, cfg);
+    return toResponse(e, cfg, handoffOf(c));
   }
 });
 
@@ -423,7 +452,7 @@ app.get('/api/topics', async (c) => {
       steward: listing.steward,
     });
   } catch (e) {
-    return toResponse(e, cfg, { org: orgForCeremony });
+    return toResponse(e, cfg, { org: orgForCeremony, ...handoffOf(c) });
   }
 });
 
@@ -448,7 +477,7 @@ app.post('/api/topics', async (c) => {
     );
     return c.json(r);
   } catch (e) {
-    return toResponse(e, cfg, { org: orgForCeremony });
+    return toResponse(e, cfg, { org: orgForCeremony, ...handoffOf(c) });
   }
 });
 
@@ -462,7 +491,7 @@ app.get('/api/topics/:id', async (c) => {
     if (!topic) return c.json({ error: 'no such topic' }, 404);
     return c.json({ topic });
   } catch (e) {
-    return toResponse(e, cfg, { org: orgForCeremony });
+    return toResponse(e, cfg, { org: orgForCeremony, ...handoffOf(c) });
   }
 });
 
@@ -483,7 +512,7 @@ app.post('/api/topics/:id/posts', async (c) => {
     );
     return c.json(r);
   } catch (e) {
-    return toResponse(e, cfg, { org: orgForCeremony });
+    return toResponse(e, cfg, { org: orgForCeremony, ...handoffOf(c) });
   }
 });
 
@@ -524,10 +553,12 @@ app.get('/api/invite', async (c) => {
       // somebody to a page that will refuse them.
       canInvite: !!known.stewardshipDelegation,
       orgName: known.orgName,
-      ceremonyUrl: homeCeremonyUrls(cfg.homeOrigin).inviteToOrg(org),
+      ceremonyUrl: homeCeremonyUrls(cfg.homeOrigin, {
+        ...(session.homeSession ? { homeSession: session.homeSession } : {}),
+      }).inviteToOrg(org),
     });
   } catch (e) {
-    return toResponse(e, cfg, { org: orgForCeremony });
+    return toResponse(e, cfg, { org: orgForCeremony, ...handoffOf(c) });
   }
 });
 
@@ -540,7 +571,7 @@ app.get('/api/members', async (c) => {
     const members = await cfg.interactions.listMembers(org, await orgAuth(cfg, c, session, org));
     return c.json({ members });
   } catch (e) {
-    return toResponse(e, cfg, { org: orgForCeremony });
+    return toResponse(e, cfg, { org: orgForCeremony, ...handoffOf(c) });
   }
 });
 
@@ -553,10 +584,12 @@ app.get('/api/messaging', async (c) => {
     return c.json({
       wirePresent: status.wirePresent,
       recipients: status.recipients,
-      approveUrl: homeCeremonyUrls(cfg.homeOrigin).approveMessaging,
+      approveUrl: homeCeremonyUrls(cfg.homeOrigin, {
+        ...(session.homeSession ? { homeSession: session.homeSession } : {}),
+      }).approveMessaging,
     });
   } catch (e) {
-    return toResponse(e, cfg);
+    return toResponse(e, cfg, handoffOf(c));
   }
 });
 
@@ -592,7 +625,7 @@ app.post('/api/messaging/send', async (c) => {
     );
     return c.json(r);
   } catch (e) {
-    return toResponse(e, cfg);
+    return toResponse(e, cfg, handoffOf(c));
   }
 });
 
@@ -626,14 +659,16 @@ app.get('/api/inbox', async (c) => {
             'This app has no grant to read your messages. You authorize it once at your Home, per app — ' +
             'and can withdraw it for this app alone.',
           code: 'read_grant',
-          ceremonyUrl: homeCeremonyUrls(cfg.homeOrigin).connectedApps,
+          ceremonyUrl: homeCeremonyUrls(cfg.homeOrigin, {
+            ...(session.homeSession ? { homeSession: session.homeSession } : {}),
+          }).connectedApps,
         },
         { status: 409 },
       );
     }
     return Response.json(body, { status: r.status });
   } catch (e) {
-    return toResponse(e, cfg);
+    return toResponse(e, cfg, handoffOf(c));
   }
 });
 
@@ -657,7 +692,7 @@ app.get('/api/library', async (c) => {
     }));
     return c.json({ entries });
   } catch (e) {
-    return toResponse(e, cfg, { org: orgForCeremony });
+    return toResponse(e, cfg, { org: orgForCeremony, ...handoffOf(c) });
   }
 });
 
@@ -681,7 +716,7 @@ app.get('/api/library/:id', async (c) => {
       storedCommitment: typeof record.commitment === 'string' ? record.commitment : null,
     });
   } catch (e) {
-    return toResponse(e, cfg, { org: orgForCeremony });
+    return toResponse(e, cfg, { org: orgForCeremony, ...handoffOf(c) });
   }
 });
 
@@ -727,7 +762,7 @@ app.post('/api/library', async (c) => {
     );
     return c.json({ artifactId: id });
   } catch (e) {
-    return toResponse(e, cfg, { org: orgForCeremony });
+    return toResponse(e, cfg, { org: orgForCeremony, ...handoffOf(c) });
   }
 });
 
@@ -740,7 +775,7 @@ app.delete('/api/library/:id', async (c) => {
     await cfg.interactions.deleteArtifact(org, c.req.param('id'), await orgAuth(cfg, c, session, org));
     return c.json({ ok: true });
   } catch (e) {
-    return toResponse(e, cfg, { org: orgForCeremony });
+    return toResponse(e, cfg, { org: orgForCeremony, ...handoffOf(c) });
   }
 });
 
@@ -828,7 +863,7 @@ app.get('/api/diagnostics', async (c) => {
       relatedOrgs: { scopedToThisApp: summarize(scoped), personsOwnView: summarize(unscoped) },
     });
   } catch (e) {
-    return toResponse(e, cfg);
+    return toResponse(e, cfg, handoffOf(c));
   }
 });
 

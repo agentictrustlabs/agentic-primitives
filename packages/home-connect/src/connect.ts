@@ -129,6 +129,19 @@ export interface ConnectResult {
   org?: RelatedOrg;
   /** Which Home issued this. */
   authOrigin: string;
+  /**
+   * A HOME session for the same person, when the sign-in route produced one.
+   *
+   * Only quick connect does. It matters because a person signed in this way has no session AT THE
+   * HOME — the exchange happened server-side — so every link an app offers into their Home
+   * (organizations, storage, messaging, connected apps) lands on a credential challenge for an
+   * account whose key they do not hold.
+   *
+   * The Home accepts it back as a `#session=` FRAGMENT handoff. A fragment, deliberately: it is
+   * never sent to a server, never appears in a referrer, and never lands in an access log — which
+   * a query parameter would do on every hop.
+   */
+  homeSession?: string;
 }
 
 export interface PersonClaims {
@@ -371,6 +384,7 @@ export function createHomeConnect(config: HomeConnectConfig): HomeConnect {
         subjectKind: 'person',
         person: subject,
         ...(session.agentName ? { agentName: session.agentName } : {}),
+        ...(session.homeSession ? { homeSession: session.homeSession } : {}),
         ...((): { delegation?: DelegationWire } => {
           const d = asDelegationWire(session.delegation);
           return d ? { delegation: d } : {};

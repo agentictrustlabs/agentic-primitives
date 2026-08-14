@@ -35,6 +35,18 @@ export interface SessionData {
   person: string;
   agentName: string | null;
   authOrigin: string;
+  /**
+   * A HOME session for the same person, when the sign-in produced one (quick connect does).
+   *
+   * Handed back to the Home as a `#session=` fragment on the links this app offers, so somebody
+   * signed in here is also recognised there. Without it every one of those links is a credential
+   * challenge for an account whose key the person does not hold — a dead end reached by clicking
+   * something that looked like navigation.
+   *
+   * Held server-side like the id_token, and only ever emitted into a FRAGMENT: never sent to a
+   * server, never in a referrer, never in an access log.
+   */
+  homeSession?: string;
   /** Unix seconds — the id_token's own `exp`, not a policy of ours. */
   exp: number;
 }
