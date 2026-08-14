@@ -4,11 +4,12 @@ import { api, CommonsError } from './api.js';
 import { Connect } from './views/Connect.js';
 import { Discussion } from './views/Discussion.js';
 import { Library } from './views/Library.js';
+import { Members } from './views/Members.js';
 import { Messages } from './views/Messages.js';
 import { Substrate } from './views/Substrate.js';
 import { CeremonyNotice, ErrorLine } from './views/parts.js';
 
-type Tab = 'discussion' | 'messages' | 'library' | 'substrate';
+type Tab = 'discussion' | 'messages' | 'library' | 'members' | 'substrate';
 
 interface HomeLinks {
   enableStorage: string;
@@ -113,7 +114,7 @@ export function App() {
       <OrgPicker orgs={orgs} active={activeOrg} onPick={setActiveOrg} homeUrl={home?.organizations ?? null} />
 
       <nav className="tabs">
-        {(['discussion', 'messages', 'library', 'substrate'] as Tab[]).map((t) => (
+        {(['discussion', 'messages', 'library', 'members', 'substrate'] as Tab[]).map((t) => (
           <button key={t} onClick={() => setTab(t)} aria-current={tab === t ? 'page' : undefined}>
             {t === 'substrate' ? 'Under the hood' : t[0]!.toUpperCase() + t.slice(1)}
           </button>
@@ -125,6 +126,7 @@ export function App() {
       {tab === 'discussion' && <Discussion org={org} />}
       {tab === 'messages' && <Messages />}
       {tab === 'library' && <Library org={org} />}
+      {tab === 'members' && <Members org={org} />}
       {tab === 'substrate' && <Substrate me={me} orgs={orgs} />}
     </div>
   );

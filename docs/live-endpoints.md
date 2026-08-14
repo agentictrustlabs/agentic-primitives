@@ -67,11 +67,24 @@ your delegate. `org-create` additionally lets the person pick or create an organ
 | `GET \| POST /connect/library` | Their (or an org's) content library |
 | `GET \| POST /connect/channels` | Discussion, Home-side |
 | `GET \| POST /connect/directory` | Community listings |
+| `POST /connect/org-invite/email` | Invite someone to an org you steward, by email |
+| `POST /connect/org-invite/redeem` | The invitee's side — join as a member |
 | `GET \| POST /connect/work` | Coordination / endeavors |
 | `GET \| POST /connect/apps` | **Home session only** — your own OIDC registrations |
 
 `/connect/apps` deliberately refuses a relying token: it is the surface that decides which apps
 exist, and an app able to call it could register more apps under the member's name.
+
+`/connect/org-invite/email` takes `{ org, email, returnUrl? }`. The Home re-verifies stewardship
+**on-chain** before doing anything, writes a single-use `org.invite:<token>` record into the
+ORGANIZATION's encrypted vault with a 7-day expiry, and sends the mail through its own gated
+provider. It answers `delivery: 'sent' | 'logged'` — `logged` means the deployment has no mail
+provider and the returned `joinUrl` is the only way the invitation travels. `returnUrl` must be an
+origin registered for the calling client (CN-1), which is what lets the invitee land back in your
+app and stops an app sending its invitees anywhere it does not own.
+
+The invitee joins as a **member** — admitted to the community's channels, granted nothing over the
+organization. Membership is not stewardship (ADR-0025).
 
 ### Per-handle Homes
 

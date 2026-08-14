@@ -18,6 +18,7 @@ pnpm dev                          # http://localhost:8799
 | **Discussion** | Topics and posts in a community | The organization's vault |
 | **Messages** | 1:1 messages, sent by the person's own agent | The recipient's inbox, at their Home |
 | **Library** | Publish documents with verifiable content commitments | The organization's vault |
+| **Members** | Who is in the community; invite someone by email | The org's vault (invite record) |
 | **Under the hood** | Your address, the delegation hash, the contracts | The chain |
 
 That last tab is not a demo flourish. An app holding authority over somebody's organization should
@@ -109,6 +110,10 @@ match it exactly. See [docs/register-your-app.md](../../docs/register-your-app.m
 - **Approve messaging.** One signature per new contact, at their Home. The refusal names the
   recipient so the approval is one click.
 - **Store anything.** Refresh and you are reading the owner's record, not a copy.
+- **Send the invitation itself.** `POST /api/invite` states the intent and forwards the person's
+  token; the Home re-verifies stewardship on-chain, writes the invite into the organization's own
+  vault, and sends the mail. This app has neither the custody to write that record nor a mail
+  provider, and wanting either would be the mistake.
 
 Each of those is a place where a normal app would quietly do the thing itself. Every one of them
 would mean holding custody the person did not grant.
