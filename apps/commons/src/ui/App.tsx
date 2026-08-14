@@ -33,9 +33,9 @@ export function App() {
     return r.me;
   }, []);
 
-  const loadOrgs = useCallback(async () => {
+  const loadOrgs = useCallback(async (fresh = false) => {
     try {
-      const r = await api.get<{ orgs: OrgSummary[] }>('/api/orgs');
+      const r = await api.get<{ orgs: OrgSummary[] }>(`/api/orgs${fresh ? '?fresh=1' : ''}`);
       setOrgs(r.orgs);
       setActiveOrg((cur) => cur || (r.orgs[0]?.address ?? ''));
     } catch (e) {
@@ -51,9 +51,13 @@ export function App() {
       const params = new URLSearchParams(window.location.search);
       const code = params.get('code');
       const state = params.get('state');
+      // A ceremony just ran ⇒ read past the cache. An org connected two seconds ago must not be
+      // invisible because some isolate learned "none" three seconds ago.
+      let justConnected = false;
       if (code && state) {
         try {
-          await api.post('/api/connect/callback', { code, state });
+          const r = await api.post<{ org?: { address: string } | null }>('/api/connect/callback', { code, state });
+          justConnected = !!r.org;
         } catch (e) {
           if (e instanceof CommonsError) setError(e);
         }
@@ -62,7 +66,7 @@ export function App() {
         window.history.replaceState({}, '', window.location.pathname);
       }
       const who = await loadMe().catch(() => null);
-      if (who) await loadOrgs();
+      if (who) await loadOrgs(justConnected);
       setBooting(false);
     })();
   }, [loadMe, loadOrgs]);
@@ -165,6 +169,21 @@ function OrgPicker({
     window.location.href = r.url;
   };
 
+  // "None" is a claim about somebody else's records, so it comes with a way to check it and a
+  // way to see what this app actually received — rather than a dead end that says try again.
+  const emptyHelp = (
+    <p className="muted" style={{ marginTop: 10, fontSize: 12 }}>
+      Just connected one and still seeing this?{' '}
+      <button className="link" onClick={() => window.location.reload()}>
+        re-check
+      </button>{' '}
+      ·{' '}
+      <a href="/api/diagnostics" target="_blank" rel="noreferrer">
+        what this app can see
+      </a>
+    </p>
+  );
+
   if (orgs.length === 0) {
     return (
       <div className="panel">
@@ -183,6 +202,7 @@ function OrgPicker({
             </a>
           )}
         </div>
+        {emptyHelp}
       </div>
     );
   }

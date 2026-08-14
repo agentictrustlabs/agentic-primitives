@@ -18,8 +18,16 @@ import { HomeConnectError } from '@starter/home-connect';
 import { InteractionsError, type CallerAuth } from '@starter/interactions-client';
 import type { LibraryEntry, Me, OrgSummary } from '../shared/api-types.js';
 import { buildConfig, ConfigError, homeCeremonyUrls, type AppConfig, type Env } from './config.js';
-import { delegationHashOf, findOrg, forgetOrgs, orgsFor } from './orgs.js';
-import { cookieHeaders, readPending, readSession, seal, type SessionData } from './session.js';
+import { delegationHashOf, findOrg, forgetOrgs, mergeCeremonyOrg, orgsFor } from './orgs.js';
+import {
+  cookieHeaders,
+  readCeremonyOrg,
+  readPending,
+  readSession,
+  seal,
+  type CeremonyOrg,
+  type SessionData,
+} from './session.js';
 
 type Vars = { cfg: AppConfig; session: SessionData | null };
 const app = new Hono<{ Bindings: Env; Variables: Vars }>();
@@ -80,9 +88,23 @@ function required(session: SessionData | null): SessionData {
   return session;
 }
 
+/**
+ * Every organization this person can act on here: the Home's scoped list, plus the one a
+ * ceremony just handed us. See `mergeCeremonyOrg` for why both.
+ */
+async function resolveOrgs(cfg: AppConfig, c: { req: { raw: Request } }, session: SessionData, fresh = false) {
+  const ceremony = await readCeremonyOrg(c.req.raw, cfg.sessionSecret);
+  return mergeCeremonyOrg(await orgsFor(cfg, session, { fresh }), ceremony);
+}
+
 /** The credentials for an org-scoped call: the person's token + the org's stewardship wire. */
-async function orgAuth(cfg: AppConfig, session: SessionData, orgAddress: string): Promise<CallerAuth> {
-  const org = findOrg(await orgsFor(cfg, session), orgAddress);
+async function orgAuth(
+  cfg: AppConfig,
+  c: { req: { raw: Request } },
+  session: SessionData,
+  orgAddress: string,
+): Promise<CallerAuth> {
+  const org = findOrg(await resolveOrgs(cfg, c, session), orgAddress);
   if (!org) {
     throw new InteractionsError(
       'not_authorized',
@@ -210,11 +232,38 @@ app.post('/api/connect/callback', async (c) => {
     const headers = new Headers();
     headers.append('set-cookie', jar.setSession(await seal(session, cfg.sessionSecret), ttl));
     headers.append('set-cookie', jar.clearPending());
+
+    // KEEP THE CEREMONY'S ORG. It arrives with its stewardship delegation and is true the moment
+    // the person finishes; the Home's `related-orgs` projection is written by another service and
+    // may not answer yet. Discarding this in favour of that is how somebody who just connected a
+    // community gets told they have none.
+    let orgStored: 'stored' | 'too-large' | 'none' = 'none';
+    if (result.org?.orgAgent) {
+      const ceremony: CeremonyOrg = {
+        address: String(result.org.orgAgent).toLowerCase(),
+        name: result.org.orgName || 'Organization',
+        ...(result.org.stewardshipDelegation ? { stewardship: result.org.stewardshipDelegation } : {}),
+        at: Date.now(),
+      };
+      const cookie = jar.setOrg(await seal(ceremony, cfg.sessionSecret), ttl);
+      if (cookie) {
+        headers.append('set-cookie', cookie);
+        orgStored = 'stored';
+      } else {
+        // Oversized cookies are dropped silently by browsers, so this is reported rather than
+        // attempted-and-hoped. The Home's list still carries the org once it catches up.
+        orgStored = 'too-large';
+      }
+    }
+
     return c.json(
       {
         person: result.person,
         agentName: result.agentName ?? null,
         org: result.org ? { address: result.org.orgAgent, name: result.org.orgName } : null,
+        // Surfaced so a failed ceremony is distinguishable from one whose org we could not keep.
+        orgStored,
+        stewardship: !!result.org?.stewardshipDelegation,
       },
       { headers },
     );
@@ -223,16 +272,22 @@ app.post('/api/connect/callback', async (c) => {
   }
 });
 
-app.post('/api/logout', (c) =>
-  c.json({ ok: true }, { headers: { 'set-cookie': cookieHeaders(c.req.url).clearSession() } }),
-);
+app.post('/api/logout', (c) => {
+  const jar = cookieHeaders(c.req.url);
+  const headers = new Headers();
+  headers.append('set-cookie', jar.clearSession());
+  headers.append('set-cookie', jar.clearOrg());
+  return c.json({ ok: true }, { headers });
+});
 
 // ── Organizations ─────────────────────────────────────────────────────────────────────────────
 app.get('/api/orgs', async (c) => {
   const cfg = c.get('cfg');
   try {
     const session = required(c.get('session'));
-    const orgs = await orgsFor(cfg, session);
+    // `?fresh=1` right after a ceremony: skip the cache rather than show somebody who just
+    // connected a community a list that predates it.
+    const orgs = await resolveOrgs(cfg, c, session, c.req.query('fresh') === '1');
     // Storage status per org, in parallel — an org whose steward never enabled storage renders
     // with a one-click pointer to the ceremony instead of a broken topic list.
     const out: OrgSummary[] = await Promise.all(
@@ -262,7 +317,7 @@ app.get('/api/topics', async (c) => {
   try {
     const session = required(c.get('session'));
     const org = c.req.query('org') ?? '';
-    const listing = await cfg.interactions.listTopics(org, await orgAuth(cfg, session, org));
+    const listing = await cfg.interactions.listTopics(org, await orgAuth(cfg, c, session, org));
     return c.json({
       topics: listing.topics.map((t) => ({
         id: t.id,
@@ -293,7 +348,7 @@ app.post('/api/topics', async (c) => {
     const r = await cfg.interactions.createTopic(
       org,
       { title, participationPolicy: body.participationPolicy ?? 'open' },
-      await orgAuth(cfg, session, org),
+      await orgAuth(cfg, c, session, org),
     );
     return c.json(r);
   } catch (e) {
@@ -306,7 +361,7 @@ app.get('/api/topics/:id', async (c) => {
   try {
     const session = required(c.get('session'));
     const org = c.req.query('org') ?? '';
-    const topic = await cfg.interactions.readTopic(org, c.req.param('id'), await orgAuth(cfg, session, org));
+    const topic = await cfg.interactions.readTopic(org, c.req.param('id'), await orgAuth(cfg, c, session, org));
     if (!topic) return c.json({ error: 'no such topic' }, 404);
     return c.json({ topic });
   } catch (e) {
@@ -325,7 +380,7 @@ app.post('/api/topics/:id/posts', async (c) => {
     const r = await cfg.interactions.postToTopic(
       org,
       { topicId: c.req.param('id'), text },
-      await orgAuth(cfg, session, org),
+      await orgAuth(cfg, c, session, org),
     );
     return c.json(r);
   } catch (e) {
@@ -338,7 +393,7 @@ app.get('/api/members', async (c) => {
   try {
     const session = required(c.get('session'));
     const org = c.req.query('org') ?? '';
-    const members = await cfg.interactions.listMembers(org, await orgAuth(cfg, session, org));
+    const members = await cfg.interactions.listMembers(org, await orgAuth(cfg, c, session, org));
     return c.json({ members });
   } catch (e) {
     return toResponse(e, cfg);
@@ -444,7 +499,7 @@ app.get('/api/library', async (c) => {
   try {
     const session = required(c.get('session'));
     const org = c.req.query('org') ?? '';
-    const catalog = await cfg.interactions.listLibrary(org, await orgAuth(cfg, session, org));
+    const catalog = await cfg.interactions.listLibrary(org, await orgAuth(cfg, c, session, org));
     const entries: LibraryEntry[] = catalog.map((a) => ({
       id: a.id,
       name: a.name,
@@ -466,7 +521,7 @@ app.get('/api/library/:id', async (c) => {
   try {
     const session = required(c.get('session'));
     const org = c.req.query('org') ?? '';
-    const record = await cfg.interactions.readArtifact(org, c.req.param('id'), await orgAuth(cfg, session, org));
+    const record = await cfg.interactions.readArtifact(org, c.req.param('id'), await orgAuth(cfg, c, session, org));
     if (!record) return c.json({ error: 'no such artifact' }, 404);
     const b64 = typeof record.bytesB64 === 'string' ? record.bytesB64 : '';
     const text = b64 ? new TextDecoder().decode(Uint8Array.from(atob(b64), (ch) => ch.charCodeAt(0))) : '';
@@ -520,7 +575,7 @@ app.post('/api/library', async (c) => {
         },
         bytes,
       },
-      await orgAuth(cfg, session, org),
+      await orgAuth(cfg, c, session, org),
     );
     return c.json({ artifactId: id });
   } catch (e) {
@@ -533,8 +588,86 @@ app.delete('/api/library/:id', async (c) => {
   try {
     const session = required(c.get('session'));
     const org = c.req.query('org') ?? '';
-    await cfg.interactions.deleteArtifact(org, c.req.param('id'), await orgAuth(cfg, session, org));
+    await cfg.interactions.deleteArtifact(org, c.req.param('id'), await orgAuth(cfg, c, session, org));
     return c.json({ ok: true });
+  } catch (e) {
+    return toResponse(e, cfg);
+  }
+});
+
+/**
+ * What this app can actually see about you, unfiltered.
+ *
+ * Session-gated, and it exists because "no community connected" has several very different
+ * causes that look identical in the UI: the ceremony never wrote a link, the link was written
+ * under a different app's id, the projection has not caught up, or this app cached an empty
+ * answer. Guessing between those from the outside is exactly the debugging tax this endpoint
+ * removes.
+ *
+ * It reads the Home TWICE on purpose — scoped to this app, and unscoped — because the difference
+ * between them IS the answer. `related-orgs?client_id=` only returns links whose `requestedBy`
+ * matches, so an org present in the unscoped list and absent from the scoped one means the link
+ * exists but belongs to a different app. Nothing here is cached.
+ */
+app.get('/api/diagnostics', async (c) => {
+  const cfg = c.get('cfg');
+  try {
+    const session = required(c.get('session'));
+
+    const read = async (url: string) => {
+      const r = await fetch(url, { headers: { authorization: `Bearer ${session.idToken}` } });
+      const text = await r.text();
+      let body: unknown = null;
+      try {
+        body = JSON.parse(text);
+      } catch {
+        body = text.slice(0, 400);
+      }
+      return { status: r.status, body };
+    };
+
+    const scopedUrl = new URL('/connect/related-orgs', session.authOrigin);
+    scopedUrl.searchParams.set('client_id', cfg.clientId);
+    const scoped = await read(scopedUrl.toString());
+    // The person's OWN view. This app is not entitled to act on what it returns — it is here
+    // purely so the two lists can be compared.
+    const unscoped = await read(new URL('/connect/related-orgs', session.authOrigin).toString());
+
+    const summarize = (r: { status: number; body: unknown }) => {
+      const orgs = (r.body as { orgs?: Record<string, unknown>[] } | null)?.orgs;
+      if (!Array.isArray(orgs)) return { status: r.status, orgs: null, raw: r.body };
+      return {
+        status: r.status,
+        count: orgs.length,
+        orgs: orgs.map((o) => ({
+          orgAgent: o.orgAgent,
+          orgName: o.orgName,
+          requestedBy: o.requestedBy,
+          hasStewardship: !!o.stewardshipDelegation,
+          hasMembership: !!o.membershipDelegation,
+          relationship: o.relationship ?? null,
+        })),
+      };
+    };
+
+    const ceremony = await readCeremonyOrg(c.req.raw, cfg.sessionSecret);
+
+    return c.json({
+      you: {
+        person: session.person,
+        agentName: session.agentName,
+        // WHICH Home issued this token — a named person signs in at their own subdomain, so
+        // this is often not the origin the app sent them to, and every read above uses it.
+        authOrigin: session.authOrigin,
+        tokenExpiresAt: new Date(session.exp * 1000).toISOString(),
+      },
+      thisApp: { clientId: cfg.clientId, redirectUri: cfg.redirectUri, a2aBase: cfg.a2aBase },
+      // The receipt from the last org-create, if we still hold it.
+      ceremonyOrg: ceremony
+        ? { address: ceremony.address, name: ceremony.name, hasStewardship: !!ceremony.stewardship }
+        : null,
+      relatedOrgs: { scopedToThisApp: summarize(scoped), personsOwnView: summarize(unscoped) },
+    });
   } catch (e) {
     return toResponse(e, cfg);
   }

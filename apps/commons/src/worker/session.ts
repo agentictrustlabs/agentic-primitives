@@ -14,6 +14,7 @@
 
 const COOKIE = 'commons_session';
 const PENDING_COOKIE = 'commons_pending';
+const ORG_COOKIE = 'commons_org';
 
 export interface SessionData {
   idToken: string;
@@ -22,6 +23,30 @@ export interface SessionData {
   authOrigin: string;
   /** Unix seconds — the id_token's own `exp`, not a policy of ours. */
   exp: number;
+}
+
+/**
+ * The organization a ceremony just handed us, kept in its own cookie.
+ *
+ * WHY THIS EXISTS. `org-create` returns the org AND its stewardship delegation in the token
+ * response — authoritative, and true the instant the person finishes. The Home ALSO writes a
+ * `related-orgs` link, but that is a projection maintained by a different service on a different
+ * timeline, and an app that depends on it alone shows "no community connected" to somebody who
+ * just connected one. Which is exactly what happened.
+ *
+ * So the ceremony result is carried here and MERGED with the Home's list, rather than discarded
+ * in favour of it. The Home stays the source of truth for what exists; this is the receipt for
+ * what just happened.
+ *
+ * Its own cookie because a stewardship wire is kilobytes and the session cookie must stay small —
+ * a session that silently exceeds the 4 KB cookie limit is a sign-in that stops working.
+ */
+export interface CeremonyOrg {
+  address: string;
+  name: string;
+  /** The org→person stewardship delegation, as returned by the Home. */
+  stewardship?: unknown;
+  at: number;
 }
 
 /** The PKCE + state a connect flow must round-trip. Ten minutes, then it is gone. */
@@ -101,6 +126,20 @@ export function cookieHeaders(url: string) {
     clearSession: (): string => `${COOKIE}=; ${attrs(secure, 0)}`,
     setPending: (sealed: string): string => `${PENDING_COOKIE}=${encodeURIComponent(sealed)}; ${attrs(secure, 600)}`,
     clearPending: (): string => `${PENDING_COOKIE}=; ${attrs(secure, 0)}`,
+    /**
+     * Returns null when the sealed value would not survive as a cookie.
+     *
+     * Browsers cap a cookie near 4 KB and DROP an oversized one silently — which would look
+     * exactly like "the ceremony did not work" while everything upstream succeeded. Refusing to
+     * set it is worse UX and better engineering: the caller reports it, and the Home's list is
+     * still there to fall back on. (Not a fallback in the ADR-0013 sense — both are the same
+     * mechanism, and this one is a receipt, not a second way of asking.)
+     */
+    setOrg: (sealed: string, ttlSeconds: number): string | null => {
+      const cookie = `${ORG_COOKIE}=${encodeURIComponent(sealed)}; ${attrs(secure, Math.max(60, ttlSeconds))}`;
+      return cookie.length > 3900 ? null : cookie;
+    },
+    clearOrg: (): string => `${ORG_COOKIE}=; ${attrs(secure, 0)}`,
   };
 }
 
@@ -115,4 +154,9 @@ export async function readSession(request: Request, secret: string): Promise<Ses
 
 export async function readPending(request: Request, secret: string): Promise<PendingConnect | null> {
   return open<PendingConnect>(readCookie(request.headers.get('cookie'), PENDING_COOKIE), secret);
+}
+
+export async function readCeremonyOrg(request: Request, secret: string): Promise<CeremonyOrg | null> {
+  const org = await open<CeremonyOrg>(readCookie(request.headers.get('cookie'), ORG_COOKIE), secret);
+  return org?.address ? org : null;
 }
