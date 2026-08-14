@@ -488,84 +488,43 @@ app.post('/api/topics/:id/posts', async (c) => {
 });
 
 /**
- * Invite someone to the selected organization, by email.
+ * Where an invitation to the selected organization gets issued.
  *
- * EXPRESSED HERE, PERFORMED AT THE HOME — which is the only place it can be. Creating an invite
- * writes a single-use, time-boxed record into the ORGANIZATION's own encrypted vault and sends an
- * email; both need custody this app does not have and should not want. So this route states the
- * intent and forwards the person's token, and the Home does all of it:
+ * NOT an attempt that fails — a selection made up front, which is the only honest shape here.
  *
- *   · re-verifies stewardship ON-CHAIN (ERC-1271 against the org, unrevoked) — an app asking
- *     nicely is not authority,
- *   · writes `org.invite:<token>` to the org vault, KEK-encrypted, with a 7-day expiry,
- *   · sends the mail through its own gated SendGrid sender, and reports `sent` vs `logged` so an
- *     unconfigured deployment is visible rather than silently swallowing invitations.
+ * An invitation must carry a member-access grant the ORGANIZATION signed against the invitee's
+ * (counterfactual) address. Without it the invitee accepts, lands in the org, and is refused with
+ * "this organization has not authorized you to join" — an invitation that looked issued at every
+ * step and admitted nobody, failing at the far end to the person who did nothing wrong.
  *
- * `returnUrl` must be an origin registered for THIS client at the Home (CN-1). That is what lets
- * the invitee land back here after joining, and it is checked against the registry — an app
- * cannot send its invitees anywhere it does not own.
+ * Producing that signature takes the organization's custody, reached through the steward's own
+ * credential. That is a Home session. This app authenticates AS the person and holds no custody —
+ * so it cannot mint one, and an app that tried and fell back would just be discovering that later
+ * and more confusingly (ADR-0013).
  *
- * The invitee joins as a MEMBER (authority-only, ADR-0025). Membership is not stewardship: it
- * admits them to the community's channels and grants nothing over the organization itself.
+ * So this route resolves WHO may invite and WHERE, and the person completes it at their Home. Same
+ * shape as every other ceremony here: enabling storage, approving messaging, granting an app a
+ * read scope. None of them happen on this origin, and that is the property worth keeping.
  */
-app.post('/api/invite', async (c) => {
+app.get('/api/invite', async (c) => {
   const cfg = c.get('cfg');
-  let orgForCeremony = '';
+  const orgForCeremony = c.req.query('org') ?? '';
   try {
     const session = required(c.get('session'));
-    const body = (await c.req.json().catch(() => ({}))) as { org?: string; email?: string };
-    const org = String(body.org ?? '').toLowerCase();
-    orgForCeremony = org;
-    const email = String(body.email ?? '').trim();
+    const org = orgForCeremony.toLowerCase();
     if (!/^0x[0-9a-fA-F]{40}$/.test(org)) return c.json({ error: 'org is required' }, 400);
-    // Shape-checked here only to fail fast on an obvious typo; the Home validates for real.
-    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return c.json({ error: 'a valid email is required' }, 400);
 
-    // The person must actually have this org in play here — the Home re-checks stewardship
-    // regardless, but refusing early keeps the app from asking on behalf of an org it never held.
     const known = findOrg(await resolveOrgs(cfg, c, session), org);
     if (!known) {
       return c.json({ error: 'this organization is not connected to this app', code: 'not_authorized' }, 403);
     }
 
-    const res = await fetch(new URL('/connect/org-invite/email', session.authOrigin).toString(), {
-      method: 'POST',
-      headers: { 'content-type': 'application/json', authorization: `Bearer ${session.idToken}` },
-      body: JSON.stringify({ org, email, returnUrl: cfg.redirectUri }),
-    });
-    const text = await res.text();
-    const out = (() => {
-      try {
-        return JSON.parse(text) as Record<string, unknown>;
-      } catch {
-        return null;
-      }
-    })();
-
-    if (!res.ok || out?.ok === false) {
-      // Reported as the Home's answer, verbatim where there is one. An empty 5xx says the Home
-      // failed AFTER accepting the request — which is a different problem from a refusal, and
-      // flattening the two would send somebody hunting for a permission they already have.
-      return c.json(
-        {
-          error:
-            (out?.error as string) ??
-            (res.status >= 500
-              ? 'the Home accepted the request and then failed to create the invite'
-              : `invite failed (HTTP ${res.status})`),
-          code: res.status >= 500 ? 'home_error' : 'invite_refused',
-          homeStatus: res.status,
-        },
-        res.status >= 500 ? 502 : 400,
-      );
-    }
-
     return c.json({
-      // `sent` when the deployment has a mail provider configured; `logged` when it does not, in
-      // which case `joinUrl` is the only way the invitation reaches anyone. Passed through rather
-      // than smoothed over — "invited" would be a lie on a deployment that mails nothing.
-      delivery: out?.delivery ?? 'unknown',
-      joinUrl: out?.joinUrl ?? null,
+      // Stewardship is what the Home will require. Reported so the UI can say so before sending
+      // somebody to a page that will refuse them.
+      canInvite: !!known.stewardshipDelegation,
+      orgName: known.orgName,
+      ceremonyUrl: homeCeremonyUrls(cfg.homeOrigin).inviteToOrg(org),
     });
   } catch (e) {
     return toResponse(e, cfg, { org: orgForCeremony });

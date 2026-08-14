@@ -10,32 +10,38 @@ interface DirectoryMember {
   [k: string]: unknown;
 }
 
-interface InviteResult {
-  /** `sent` when the Home has a mail provider; `logged` when it does not. */
-  delivery: string;
-  /** The join link. The ONLY way the invitation travels when delivery is `logged`. */
-  joinUrl: string | null;
-  email: string;
+interface InviteRoute {
+  /** Does this app hold the org's stewardship wire? The Home requires it to issue an invitation. */
+  canInvite: boolean;
+  orgName: string;
+  /** The Home page where the invitation is actually issued. */
+  ceremonyUrl: string;
 }
 
 /**
- * Members — who is in the community, and how somebody else gets in.
+ * Members — who is in the community, and where somebody else gets invited.
  *
- * The invite is expressed here and performed at the Home, because it cannot be performed here:
- * it writes a single-use record into the ORGANIZATION's encrypted vault and sends mail, both of
- * which need custody this app does not hold. The Home re-verifies stewardship on-chain before it
- * does either — an app asking on somebody's behalf is not authority.
+ * The invitation is RESOLVED here and ISSUED at the Home. Not an attempt that falls back: a
+ * selection made up front, because a relying app can never complete this one.
  *
- * The invitee joins as a MEMBER, which admits them to the community's channels and grants nothing
- * over the organization. Membership is not stewardship (ADR-0025), and the difference is worth
- * saying on the screen where someone is handing it out.
+ * An invitation carries a member-access grant the ORGANIZATION signed against the invitee's
+ * address. Without it they accept, arrive, and are refused — an invitation that looked issued at
+ * every step and admitted nobody. Producing that signature takes the org's custody, reached
+ * through the steward's own credential, which is a Home session. This app authenticates AS the
+ * person and holds no custody.
+ *
+ * So it does what it does for every other ceremony — enabling storage, approving messaging,
+ * granting a read scope — and sends the person to their Home. None of those happen on this
+ * origin, and that is the property worth keeping.
+ *
+ * The invitee joins as a MEMBER: admitted to the community's channels, granted nothing over the
+ * organization. Membership is not stewardship (ADR-0025), and the screen where somebody hands it
+ * out is the right place to say so.
  */
 export function Members({ org }: { org: OrgSummary | null }) {
   const [members, setMembers] = useState<DirectoryMember[]>([]);
-  const [email, setEmail] = useState('');
-  const [sent, setSent] = useState<InviteResult | null>(null);
+  const [invite, setInvite] = useState<InviteRoute | null>(null);
   const [error, setError] = useState<CommonsError | null>(null);
-  const [busy, setBusy] = useState(false);
   const [loaded, setLoaded] = useState(false);
 
   const orgAddress = org?.address ?? '';
@@ -46,6 +52,7 @@ export function Members({ org }: { org: OrgSummary | null }) {
     try {
       const r = await api.get<{ members: DirectoryMember[] }>(`/api/members?org=${orgAddress}`);
       setMembers(r.members);
+      setInvite(await api.get<InviteRoute>(`/api/invite?org=${orgAddress}`));
     } catch (e) {
       if (e instanceof CommonsError) setError(e);
     } finally {
@@ -54,31 +61,12 @@ export function Members({ org }: { org: OrgSummary | null }) {
   }, [orgAddress]);
 
   useEffect(() => {
-    setSent(null);
+    setInvite(null);
     setLoaded(false);
     void load();
   }, [load]);
 
   if (!org) return <Empty>Connect a community to see its members.</Empty>;
-
-  const invite = async () => {
-    if (!email.trim()) return;
-    setBusy(true);
-    setError(null);
-    setSent(null);
-    try {
-      const r = await api.post<{ delivery: string; joinUrl: string | null }>('/api/invite', {
-        org: orgAddress,
-        email: email.trim(),
-      });
-      setSent({ ...r, email: email.trim() });
-      setEmail('');
-    } catch (e) {
-      if (e instanceof CommonsError) setError(e);
-    } finally {
-      setBusy(false);
-    }
-  };
 
   return (
     <>
@@ -92,55 +80,43 @@ export function Members({ org }: { org: OrgSummary | null }) {
         <h2>Invite someone to {org.name}</h2>
         <p className="muted">
           They join as a <strong>member</strong> — admitted to this community&apos;s channels, and granted
-          nothing over the organization itself. The invitation is single-use and expires in seven days.
+          nothing over the organization itself.
         </p>
-        {!org.steward && (
+        {/*
+          NOT a form that posts an email from here, and the reason is the whole architecture.
+
+          An invitation has to carry a grant the ORGANIZATION signed against the invitee's address.
+          Without it they accept, arrive, and are told the organization has not authorized them —
+          an invitation that looked issued at every step and admitted nobody.
+
+          That signature takes the organization's custody, reached through your own credential,
+          which lives at your Home and deliberately not here. So this app sends you there, exactly
+          as it does for enabling storage or approving messaging.
+        */}
+        <p className="muted" style={{ marginTop: 8 }}>
+          The invitation is issued at your Home. It has to be: it carries a grant the organization
+          signs against the person you are inviting, and producing that takes your credential — which
+          lives at your Home and never on this origin. An invitation without it would create them a
+          home that {org.name} then refuses to admit.
+        </p>
+        {invite && !invite.canInvite && (
           <p className="muted" style={{ marginTop: 8 }}>
-            Only a steward can invite. Your Home will refuse this on-chain, not this app — so if you
-            believe you steward {org.name}, the delegation is what to look at.
+            This app holds no stewardship delegation for {org.name}, so your Home will refuse to issue
+            one. Re-connect the community here so it issues you the wire.
           </p>
         )}
-        <div className="stack" style={{ marginTop: 10, maxWidth: 460 }}>
-          <input
-            type="text"
-            placeholder="their email address"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') void invite();
-            }}
-          />
-          <div className="row">
-            <button className="primary" onClick={invite} disabled={busy || !email.trim()}>
-              {busy ? 'Asking your Home…' : 'Send invitation'}
-            </button>
-            <span className="muted">sent by your Home, from the organization&apos;s vault</span>
-          </div>
-        </div>
-
-        {sent && (
-          <div className="notice" style={{ marginTop: 12 }}>
-            {sent.delivery === 'sent' ? (
-              <>
-                <strong>Invitation emailed to {sent.email}</strong>
-                <p style={{ margin: '4px 0 0' }}>
-                  They join by opening the link, confirming that address, and signing in at their own Home
-                  — which is where their identity gets created, not here.
-                </p>
-              </>
-            ) : (
-              <>
-                <strong>Invitation created — but not emailed</strong>
-                <p style={{ margin: '4px 0 8px' }}>
-                  This Home has no mail provider configured, so it logged the message instead of sending it.
-                  The link below is the only way the invitation reaches {sent.email}. Saying &quot;invited&quot;
-                  here would be a lie.
-                </p>
-                {sent.joinUrl && (
-                  <code style={{ wordBreak: 'break-all', fontSize: 11 }}>{sent.joinUrl}</code>
-                )}
-              </>
-            )}
+        {invite && (
+          <div className="row" style={{ marginTop: 12 }}>
+            <a
+              className="primary"
+              href={invite.ceremonyUrl}
+              target="_blank"
+              rel="noreferrer"
+              style={{ textDecoration: 'none', display: 'inline-block' }}
+            >
+              Invite at your Home →
+            </a>
+            <span className="muted">opens {org.name}&apos;s invite page</span>
           </div>
         )}
       </div>

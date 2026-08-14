@@ -118,5 +118,15 @@ export const homeCeremonyUrls = (homeOrigin: string, ctx: { returnTo?: string; o
     approveMessaging: `${homeOrigin}/messages`,
     organizations: `${homeOrigin}/organizations`,
     connectedApps: `${homeOrigin}/apps`,
+    /**
+     * Where an invitation is actually issued.
+     *
+     * An invite must carry a member-access grant signed by the ORGANIZATION, or the invitee gets a
+     * home the org then refuses to admit. Producing that signature takes the org's custody, reached
+     * through the steward's credential — a Home session. A relying app authenticates AS the person
+     * and holds no custody, so it cannot mint one and should not pretend to.
+     */
+    inviteToOrg: (org: string): string =>
+      `${homeOrigin}/org/${org.toLowerCase()}/invite`,
   };
 };
