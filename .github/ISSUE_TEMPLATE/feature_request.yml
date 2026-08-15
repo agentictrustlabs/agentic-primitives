@@ -1,0 +1,27 @@
+name: Feature request
+description: Propose an addition to the kit — CLI, templates, wrappers, or docs.
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        One thing to check first: if the feature needs your app to hold custody, mint authority,
+        or store user content, it is behind a substrate boundary by design —
+        see [the principles](../../docs/principles.md).
+  - type: textarea
+    id: problem
+    attributes:
+      label: What are you trying to build, and what stops you?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed change
+      description: What should the kit do differently? CLI flag, template addition, wrapper method, doc.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: What you do today instead

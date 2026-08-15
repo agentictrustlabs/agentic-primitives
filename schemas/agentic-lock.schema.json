@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agenticprimitives.dev/schemas/agentic-lock.schema.json",
+  "title": "Generated application Agentic Primitives lock",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "devkitRelease",
+    "template",
+    "features",
+    "packages",
+    "contracts",
+    "ontology",
+    "skills"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "type": "string"
+    },
+    "devkitRelease": {
+      "type": "string"
+    },
+    "exampleOnly": {
+      "type": "boolean"
+    },
+    "template": {
+      "type": "string"
+    },
+    "features": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "packages": {
+      "type": "object"
+    },
+    "contracts": {
+      "type": "object"
+    },
+    "ontology": {
+      "type": "object"
+    },
+    "skills": {
+      "type": "object"
+    }
+  },
+  "additionalProperties": true
+}

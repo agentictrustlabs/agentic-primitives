@@ -1,0 +1,5 @@
+# Copy to `.dev.vars` (gitignored) before `pnpm dev`.
+#
+# SESSION_SECRET encrypts the session cookie (AES-GCM). Any 32+ random bytes.
+# Generate one:  node -e "console.log(crypto.randomUUID()+crypto.randomUUID())"
+SESSION_SECRET=replace-me-with-32-plus-random-bytes

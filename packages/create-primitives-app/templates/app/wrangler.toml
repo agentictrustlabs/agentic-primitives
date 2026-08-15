@@ -1,0 +1,56 @@
+# __PROJECT_NAME__ — one Worker. It serves the SPA and proxies the live rails.
+# No D1, no KV, no Durable Object, no queue: durable records live in the owner's vault.
+#
+#   pnpm deploy
+#
+# Before the first deploy:
+#   1. wrangler secret put SESSION_SECRET
+#   2. register this origin at the Home — docs/register-your-app.md
+
+name = "__WORKER_NAME__"
+main = "src/worker/index.ts"
+compatibility_date = "2026-05-19"
+compatibility_flags = ["nodejs_compat"]
+
+[assets]
+directory = "./dist/client"
+binding = "ASSETS"
+not_found_handling = "none"
+
+[observability]
+enabled = true
+
+[dev]
+port = 8799
+
+[vars]
+# Must be registered at the Home. REDIRECT_URI is an EXACT match (trailing slash matters).
+CLIENT_ID = "__CLIENT_ID__"
+REDIRECT_URI = "http://localhost:8799/"
+
+HOME_ORIGIN = "https://www.impact-agent.me"
+HOME_ZONE = "impact-agent.me"
+
+# Your backend account — a delegate, never a custodian.
+DELEGATE = "0x89D13c596c45E4eE80Af5ae06C727FE9A820ffD0"
+
+A2A_BASE = "https://demo-a2a-production.richardpedersen3.workers.dev"
+CHAIN_ID = "84532"
+
+[env.production]
+workers_dev = true
+
+# Same Cloudflare account as the rails? Keep this binding (error 1042 otherwise).
+# Different account? Delete the [[env.production.services]] block.
+[[env.production.services]]
+binding = "A2A"
+service = "demo-a2a-production"
+
+[env.production.vars]
+CLIENT_ID = "__CLIENT_ID__"
+REDIRECT_URI = "https://__WORKER_NAME__-production.YOUR_SUBDOMAIN.workers.dev/"
+HOME_ORIGIN = "https://www.impact-agent.me"
+HOME_ZONE = "impact-agent.me"
+DELEGATE = "0x89D13c596c45E4eE80Af5ae06C727FE9A820ffD0"
+A2A_BASE = "https://demo-a2a-production.richardpedersen3.workers.dev"
+CHAIN_ID = "84532"

@@ -1,0 +1,24 @@
+{
+  "name": "@agenticprimitives/dev-mcp",
+  "version": "0.1.0",
+  "description": "Read-only Developer MCP server for the Agentic Primitives devkit — exact release, package, contract, and skill knowledge for coding agents. Holds no keys, signs nothing, broadcasts nothing.",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "agentic-dev-mcp": "./src/index.js"
+  },
+  "files": [
+    "src"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.17.0",
+    "zod": "^3.24.1"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "node test/smoke.mjs"
+  }
+}

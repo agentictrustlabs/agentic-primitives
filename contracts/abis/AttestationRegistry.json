@@ -1,0 +1,436 @@
+[
+  {
+    "type": "function",
+    "name": "EPOCH_SECONDS",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint64",
+        "internalType": "uint64"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "assertAssociation",
+    "inputs": [
+      {
+        "name": "req",
+        "type": "tuple",
+        "internalType": "struct AttestationRegistry.AssociationAttestationRequest",
+        "components": [
+          {
+            "name": "schemaId",
+            "type": "bytes32",
+            "internalType": "bytes32"
+          },
+          {
+            "name": "credentialType",
+            "type": "bytes32",
+            "internalType": "bytes32"
+          },
+          {
+            "name": "credentialHash",
+            "type": "bytes32",
+            "internalType": "bytes32"
+          },
+          {
+            "name": "offchainCredentialStatusList",
+            "type": "bytes32",
+            "internalType": "bytes32"
+          },
+          {
+            "name": "subject",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "issuer",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "issuerSignature",
+            "type": "bytes",
+            "internalType": "bytes"
+          },
+          {
+            "name": "salt",
+            "type": "uint256",
+            "internalType": "uint256"
+          }
+        ]
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "bytes32",
+        "internalType": "bytes32"
+      }
+    ],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "assertJointAgreement",
+    "inputs": [
+      {
+        "name": "req",
+        "type": "tuple",
+        "internalType": "struct AttestationRegistry.JointAgreementAttestationRequest",
+        "components": [
+          {
+            "name": "schemaId",
+            "type": "bytes32",
+            "internalType": "bytes32"
+          },
+          {
+            "name": "credentialType",
+            "type": "bytes32",
+            "internalType": "bytes32"
+          },
+          {
+            "name": "credentialHash",
+            "type": "bytes32",
+            "internalType": "bytes32"
+          },
+          {
+            "name": "refUID",
+            "type": "bytes32",
+            "internalType": "bytes32"
+          },
+          {
+            "name": "bilateralConsentRef",
+            "type": "bytes32",
+            "internalType": "bytes32"
+          },
+          {
+            "name": "offchainCredentialStatusList",
+            "type": "bytes32",
+            "internalType": "bytes32"
+          },
+          {
+            "name": "party1",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "party2",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "issuer",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "issuerSignature",
+            "type": "bytes",
+            "internalType": "bytes"
+          },
+          {
+            "name": "party1Signature",
+            "type": "bytes",
+            "internalType": "bytes"
+          },
+          {
+            "name": "party2Signature",
+            "type": "bytes",
+            "internalType": "bytes"
+          },
+          {
+            "name": "salt",
+            "type": "uint256",
+            "internalType": "uint256"
+          }
+        ]
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "bytes32",
+        "internalType": "bytes32"
+      }
+    ],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "getAttestation",
+    "inputs": [
+      {
+        "name": "uid",
+        "type": "bytes32",
+        "internalType": "bytes32"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "tuple",
+        "internalType": "struct AttestationRegistry.Attestation",
+        "components": [
+          {
+            "name": "uid",
+            "type": "bytes32",
+            "internalType": "bytes32"
+          },
+          {
+            "name": "schemaId",
+            "type": "bytes32",
+            "internalType": "bytes32"
+          },
+          {
+            "name": "credentialType",
+            "type": "bytes32",
+            "internalType": "bytes32"
+          },
+          {
+            "name": "credentialHash",
+            "type": "bytes32",
+            "internalType": "bytes32"
+          },
+          {
+            "name": "refUID",
+            "type": "bytes32",
+            "internalType": "bytes32"
+          },
+          {
+            "name": "bilateralConsentRef",
+            "type": "bytes32",
+            "internalType": "bytes32"
+          },
+          {
+            "name": "offchainCredentialStatusList",
+            "type": "bytes32",
+            "internalType": "bytes32"
+          },
+          {
+            "name": "epochBucket",
+            "type": "uint64",
+            "internalType": "uint64"
+          },
+          {
+            "name": "revocationEpochBucket",
+            "type": "uint64",
+            "internalType": "uint64"
+          },
+          {
+            "name": "subject",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "party2",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "issuer",
+            "type": "address",
+            "internalType": "address"
+          }
+        ]
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "isValid",
+    "inputs": [
+      {
+        "name": "uid",
+        "type": "bytes32",
+        "internalType": "bytes32"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "bool",
+        "internalType": "bool"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "revokeOwnAssociation",
+    "inputs": [
+      {
+        "name": "uid",
+        "type": "bytes32",
+        "internalType": "bytes32"
+      },
+      {
+        "name": "reasonHash",
+        "type": "bytes32",
+        "internalType": "bytes32"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "revokeOwnJointAgreement",
+    "inputs": [
+      {
+        "name": "uid",
+        "type": "bytes32",
+        "internalType": "bytes32"
+      },
+      {
+        "name": "reasonHash",
+        "type": "bytes32",
+        "internalType": "bytes32"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "event",
+    "name": "Attested",
+    "inputs": [
+      {
+        "name": "subject",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      },
+      {
+        "name": "issuer",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      },
+      {
+        "name": "credentialType",
+        "type": "bytes32",
+        "indexed": true,
+        "internalType": "bytes32"
+      },
+      {
+        "name": "uid",
+        "type": "bytes32",
+        "indexed": false,
+        "internalType": "bytes32"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "JointAttested",
+    "inputs": [
+      {
+        "name": "party1",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      },
+      {
+        "name": "party2",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      },
+      {
+        "name": "credentialType",
+        "type": "bytes32",
+        "indexed": true,
+        "internalType": "bytes32"
+      },
+      {
+        "name": "uid",
+        "type": "bytes32",
+        "indexed": false,
+        "internalType": "bytes32"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "Revoked",
+    "inputs": [
+      {
+        "name": "subjectOrParty",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      },
+      {
+        "name": "credentialType",
+        "type": "bytes32",
+        "indexed": true,
+        "internalType": "bytes32"
+      },
+      {
+        "name": "uid",
+        "type": "bytes32",
+        "indexed": false,
+        "internalType": "bytes32"
+      },
+      {
+        "name": "reasonHash",
+        "type": "bytes32",
+        "indexed": false,
+        "internalType": "bytes32"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "error",
+    "name": "AlreadyRevoked",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "AttestationAlreadyExists",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "AttestationNotFound",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "EmptyCredentialHash",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "InvalidIssuerSignature",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "InvalidParties",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "InvalidPartyConsent",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "NotParty",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "NotSubject",
+    "inputs": []
+  }
+]

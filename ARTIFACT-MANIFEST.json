@@ -1,0 +1,682 @@
+{
+  "schemaVersion": "1.0.0",
+  "release": "2026.08.0-pilot.1",
+  "files": 135,
+  "artifacts": [
+    {
+      "path": "release-manifest.json",
+      "sha256": "ba4ea26b1d02a6bec9b28708ed7f87ff5337663c239140d49f3c26fff57bf2ac",
+      "bytes": 7743
+    },
+    {
+      "path": "catalog/contracts.json",
+      "sha256": "a0011c3b0371070cf1698dbbe127b9f8c8b3cc81857932d2d56d6b4b19e3b0d7",
+      "bytes": 7012
+    },
+    {
+      "path": "catalog/packages.json",
+      "sha256": "d438c6091808ad9d061cfc50c0bbb2b59392e4d557196ea19cb9fdfb53da29dd",
+      "bytes": 6461
+    },
+    {
+      "path": "catalog/skills.json",
+      "sha256": "95f756bac36dc3b1acf825069c4947133201355141f61f7deb51c123359d833c",
+      "bytes": 826
+    },
+    {
+      "path": "contracts/abis/AgentAccount.json",
+      "sha256": "69ec21189396a59397b587c1e02316c7bafb3966fa401169eb35739100a1a39f",
+      "bytes": 32431
+    },
+    {
+      "path": "contracts/abis/AgentAccountFactory.json",
+      "sha256": "96cd5b96648eb9844f615c1af5364211a708e4358908455c0e24c919a0a58190",
+      "bytes": 10515
+    },
+    {
+      "path": "contracts/abis/AgentNameAttributeResolver.json",
+      "sha256": "bb6ff25dfdba9496552af2ecb24e15fcd2977349ffb856c2bfb46892224f6cfd",
+      "bytes": 14975
+    },
+    {
+      "path": "contracts/abis/AgentNamePredicates.json",
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    {
+      "path": "contracts/abis/AgentNameRegistry.json",
+      "sha256": "848b4fec51a918943a2f6fafa93251c9a478d2b1acb009a2eaa5da16561b41bd",
+      "bytes": 15949
+    },
+    {
+      "path": "contracts/abis/AgentNameUniversalResolver.json",
+      "sha256": "75d3fb8d9d1829dd6a27d88ec7fa4f72fa251a6e58b04c42ec8b7b919e45e9bd",
+      "bytes": 4073
+    },
+    {
+      "path": "contracts/abis/AgentProfilePredicates.json",
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    {
+      "path": "contracts/abis/AgentProfileResolver.json",
+      "sha256": "96e6283433281c83ac60be1b77d2de1ed84a042411c186c3545870b76a127e28",
+      "bytes": 19482
+    },
+    {
+      "path": "contracts/abis/AgentRegistryBase.json",
+      "sha256": "69cb55a5c60ce20c1d9980dc7e26341ba3076a6c0f139f9cbd5d98dadc73acac",
+      "bytes": 11697
+    },
+    {
+      "path": "contracts/abis/AgentRelationship.json",
+      "sha256": "79c17fb62f9955b073dc1fa75ab1b94aebd48250257287c791837bb417bd5216",
+      "bytes": 11368
+    },
+    {
+      "path": "contracts/abis/AgentRelationshipPredicates.json",
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    {
+      "path": "contracts/abis/AgenticGovernance.json",
+      "sha256": "b04f9051a3c8758c810b6085921cd47af54b9f8f385891a718b6e1bd70b64bf4",
+      "bytes": 5234
+    },
+    {
+      "path": "contracts/abis/AgreementRegistry.json",
+      "sha256": "3d500940245a046a4313e1db8adc7cdb59746d03d78eba013aa5ad3c798ec9b8",
+      "bytes": 8935
+    },
+    {
+      "path": "contracts/abis/AllowedMethodsEnforcer.json",
+      "sha256": "e78b2f18caa349e3226f594a87d48fa1cd959e03ce3f6eb3ab7e05285f4f8125",
+      "bytes": 1977
+    },
+    {
+      "path": "contracts/abis/AllowedTargetsEnforcer.json",
+      "sha256": "2f421e1b1cb3105c0d121a42fbc530761d233b8193ceb9e251cced3c64ac7c1f",
+      "bytes": 1896
+    },
+    {
+      "path": "contracts/abis/ApprovedHashRegistry.json",
+      "sha256": "714f9bfadcad668ed9b73997b139bf678259fe9ce527a7ea3e5bebd64c5deae1",
+      "bytes": 2049
+    },
+    {
+      "path": "contracts/abis/AttestationRegistry.json",
+      "sha256": "a8ec2715545f2a7bfd2cd0256115a39cfea8d855eca73daa978fe4fbd929f5f2",
+      "bytes": 9395
+    },
+    {
+      "path": "contracts/abis/AttributeStorage.json",
+      "sha256": "2dff157d7641d1886879e611d6e5d6406d28fb58ded9ca8584fdb8d4fee04924",
+      "bytes": 10237
+    },
+    {
+      "path": "contracts/abis/CallDataHashEnforcer.json",
+      "sha256": "61b766ecee830c57c5da17a7a0cd69fb6274a370d5e2ecfeb09d162fea945e65",
+      "bytes": 2189
+    },
+    {
+      "path": "contracts/abis/CaveatEnforcerBase.json",
+      "sha256": "badb8afcae52d3e5bcdd393f15f51bcbfb29a88297fea762794885dfea153759",
+      "bytes": 2498
+    },
+    {
+      "path": "contracts/abis/CustodyPolicy.json",
+      "sha256": "b1e5ee85e17ea9f25456465eb6cb8428296264b3e8e4feb8a8462c4a9cffe08e",
+      "bytes": 21388
+    },
+    {
+      "path": "contracts/abis/DelegationManager.json",
+      "sha256": "172d1c4fff623ef202e02de1299b8d02965f8aec904e93930c66d8404f598468",
+      "bytes": 14023
+    },
+    {
+      "path": "contracts/abis/GeoFeatureRegistry.json",
+      "sha256": "bc5aebda6e870cb21311f5d76fb356a9ffef9f63c058c565f1c5687699f098e9",
+      "bytes": 13448
+    },
+    {
+      "path": "contracts/abis/GovernanceManaged.json",
+      "sha256": "76c75efa891b6be338fde88ccb5d7ea8a8eb549ed85d08c6646541359ae7d07e",
+      "bytes": 677
+    },
+    {
+      "path": "contracts/abis/IAgentAccount.json",
+      "sha256": "3c8ad009a81fcbb02d17c9931841e8f9b54287f9072ea56a3823e07af87d7b41",
+      "bytes": 5188
+    },
+    {
+      "path": "contracts/abis/IAgentAccountFactoryAccessor.json",
+      "sha256": "9375928c4df6667606a91533f7cf69fec38f8047740020976e906cdf892df3c4",
+      "bytes": 228
+    },
+    {
+      "path": "contracts/abis/IAgentAccountFactoryView.json",
+      "sha256": "48b556517e6e5be20c48aae39990c8a9ff2b3f4f97364d6b2c362ab5baf2289a",
+      "bytes": 924
+    },
+    {
+      "path": "contracts/abis/IAgentAccountPauseView.json",
+      "sha256": "ecd38f117b0d484093fc5a6ac3a2e7b2cdb90f5a1c7b0d07dd3e6eb80abe3123",
+      "bytes": 223
+    },
+    {
+      "path": "contracts/abis/IAgenticPrimitivesAgentAccount.json",
+      "sha256": "bd89d2b3b3084dcc2ef199ceaa9b4f696baa6b8fc26f559d0181098d08ef5518",
+      "bytes": 246
+    },
+    {
+      "path": "contracts/abis/IApprovedHashRegistryView.json",
+      "sha256": "e9366918370d5dd343f19ed6d550b515dc924779e54f07fd079e42177dad75dc",
+      "bytes": 435
+    },
+    {
+      "path": "contracts/abis/IAttributeReader.json",
+      "sha256": "c516cefe4b447b799e4be1e3b72e62d25d2800ee958bed701d352fcb358a753b",
+      "bytes": 1771
+    },
+    {
+      "path": "contracts/abis/ICaveatEnforcer.json",
+      "sha256": "ddea8cd5adb975239257504a998e2e239c984d68838eaddd5937e4efab8c6772",
+      "bytes": 1936
+    },
+    {
+      "path": "contracts/abis/ICustodyPolicyFactoryView.json",
+      "sha256": "4d3d70f16aba557cc25d0119c3cb05a034b6bd540ff3a7da4d84851e61319432",
+      "bytes": 231
+    },
+    {
+      "path": "contracts/abis/ICustodyPolicyPauseView.json",
+      "sha256": "ecd38f117b0d484093fc5a6ac3a2e7b2cdb90f5a1c7b0d07dd3e6eb80abe3123",
+      "bytes": 223
+    },
+    {
+      "path": "contracts/abis/IDelegationManager.json",
+      "sha256": "fb2d421509752ae367d3913e79e4b90c496b9e811cd21d3f9fc806fa9f32d21f",
+      "bytes": 8801
+    },
+    {
+      "path": "contracts/abis/IERC7579HookLike.json",
+      "sha256": "034629a3c1440b4059fe43d2b215499ae0ca9cdffbbe010e81a920dd27ff4382",
+      "bytes": 783
+    },
+    {
+      "path": "contracts/abis/IERC7579Module.json",
+      "sha256": "723447181766e0dd12abb48433496b742fb2d6b6ee164d2b75ea1fd7ea8ee05c",
+      "bytes": 565
+    },
+    {
+      "path": "contracts/abis/IERC7579ModuleLifecycle.json",
+      "sha256": "79d725840f49f1fbc18cdb54b48195f6e394a1260d07640f373c907953a704b6",
+      "bytes": 1033
+    },
+    {
+      "path": "contracts/abis/IERC7579ModuleLike.json",
+      "sha256": "015cdb2e103817e4f6564ce11b99d9fca5f5574d85f30e1594f4c0ccd64db53d",
+      "bytes": 471
+    },
+    {
+      "path": "contracts/abis/IGovernanceView.json",
+      "sha256": "a00532d1148ee07f1982e567cdee5a8c1e2bc6fade23aa7b7c97991a4079d93c",
+      "bytes": 548
+    },
+    {
+      "path": "contracts/abis/IPaymentReceiptRegistry.json",
+      "sha256": "daad04a37b7006fc455ea66b37306020696a1bd0839efd756365e8478160e7a0",
+      "bytes": 980
+    },
+    {
+      "path": "contracts/abis/IRegistryMembershipPolicy.json",
+      "sha256": "9acdfd258abffb806736d82afff00bfbd3e281b79300f98865a0579ec3be26a1",
+      "bytes": 1321
+    },
+    {
+      "path": "contracts/abis/MockUSDC.json",
+      "sha256": "a44375ad3de1ebc9fc44795449060a2e4f7d85d8553c1c5de16d07e27931cdbb",
+      "bytes": 11523
+    },
+    {
+      "path": "contracts/abis/MultiSendCallOnly.json",
+      "sha256": "d344c01b508ef6b93dfc809545d533e2a59800f80a0833184083fb66b1c47c4b",
+      "bytes": 466
+    },
+    {
+      "path": "contracts/abis/MultiSendCallOnlyHarness.json",
+      "sha256": "3e80e3c143fec8797a93056302fad071fc5b733bd9d742f52191892499b017af",
+      "bytes": 704
+    },
+    {
+      "path": "contracts/abis/OntologyTermRegistry.json",
+      "sha256": "21f964f796c5dc16192d09441396b5c2f91847407198966493bf4d3fc7a8f3e2",
+      "bytes": 7689
+    },
+    {
+      "path": "contracts/abis/P256Verifier.json",
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    {
+      "path": "contracts/abis/PaymentEnforcer.json",
+      "sha256": "e4cfaea1bc0d6cbbd3e613bceb43358d0ecbce3aae320b08dea5d6bf8466c2a9",
+      "bytes": 8551
+    },
+    {
+      "path": "contracts/abis/PaymentEscrow.json",
+      "sha256": "b6ac0980908a584392816f9dbb4abeb6e7502299848f3120edf4ddb337d09fbc",
+      "bytes": 6095
+    },
+    {
+      "path": "contracts/abis/PaymentReceiptRegistry.json",
+      "sha256": "d0ca6bd2ef1bba923dc2c641a7a5b7f88ccbc6fb13e938d196f51bc32963c635",
+      "bytes": 3451
+    },
+    {
+      "path": "contracts/abis/PermissionlessSubregistry.json",
+      "sha256": "3983221e4fc0d4698b652c2a3d65331d4b138437a829c51dc232ec38c1227ad9",
+      "bytes": 3852
+    },
+    {
+      "path": "contracts/abis/QuorumEnforcer.json",
+      "sha256": "4c4ddecef04a08224fde800f3c731ed861a1cdbb711dc12166c86dd1060e3ff1",
+      "bytes": 5800
+    },
+    {
+      "path": "contracts/abis/RelationshipTypeRegistry.json",
+      "sha256": "b7c445300cd7ce2f008886ce4a07f9732d8e8a842873829166a2139df632424e",
+      "bytes": 8767
+    },
+    {
+      "path": "contracts/abis/ShapeRegistry.json",
+      "sha256": "b3cc214461576fc8c71d4e543a76c875c7b0b50f1682e7d6eed1ba11bc169bfe",
+      "bytes": 12531
+    },
+    {
+      "path": "contracts/abis/SignatureSlotRecovery.json",
+      "sha256": "b047011862f1c0eba71d69da623beee4616445d30ca8a633b71fe689eab3c44c",
+      "bytes": 1544
+    },
+    {
+      "path": "contracts/abis/SkillDefinitionRegistry.json",
+      "sha256": "ca6a0b1b445b7c7d3c92f7c4cfc24a6596ea7ca0f559b8fd0f3af505b4f5602c",
+      "bytes": 10351
+    },
+    {
+      "path": "contracts/abis/SmartAgentModuleTypes.json",
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    {
+      "path": "contracts/abis/SmartAgentPaymaster.json",
+      "sha256": "637d66e62400bca8ceab9e664545cf7e0cea97e8b0fb651fc202a09c4cc5e379",
+      "bytes": 17027
+    },
+    {
+      "path": "contracts/abis/TimestampEnforcer.json",
+      "sha256": "cb46a34d683b7e2c8b7fc247e673a8fade49848d9e6c251457672de188837c29",
+      "bytes": 1973
+    },
+    {
+      "path": "contracts/abis/UniversalSignatureValidator.json",
+      "sha256": "e2dacee747bf42ed824256074e305bafc4c2ee1ed89ae50690a9590db71af36c",
+      "bytes": 1146
+    },
+    {
+      "path": "contracts/abis/ValueEnforcer.json",
+      "sha256": "786843e8704e6b07eb0adbde4f83200d8debb4863ef7574379259b8a186d15d1",
+      "bytes": 1896
+    },
+    {
+      "path": "contracts/abis/WebAuthnLib.json",
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    {
+      "path": "contracts/deployments/eip155-84532/base-sepolia-2026.08.0/agentAccountFactory.json",
+      "sha256": "b4b35dc54cd38d5c1490ad5d9f08dcc0a28fe68466f4dc7a18f09df980e6bcd8",
+      "bytes": 1396
+    },
+    {
+      "path": "contracts/deployments/eip155-84532/base-sepolia-2026.08.0/agentAccountImplementation.json",
+      "sha256": "9ddac61ac6090be0bc6133cbee87baff14ed44ebd02619eee90a08687df2d7c1",
+      "bytes": 1403
+    },
+    {
+      "path": "contracts/deployments/eip155-84532/base-sepolia-2026.08.0/agentNameRegistry.json",
+      "sha256": "1f7eda22a63c42e8015135d4949649341be9eb28a8a6026c36708a5a8dfdf7d5",
+      "bytes": 1390
+    },
+    {
+      "path": "contracts/deployments/eip155-84532/base-sepolia-2026.08.0/agentNameResolver.json",
+      "sha256": "85536c69e5c5783269b5dd9a8808cfe9432b182074c6057c505bd03e14fc785d",
+      "bytes": 1293
+    },
+    {
+      "path": "contracts/deployments/eip155-84532/base-sepolia-2026.08.0/agentNameUniversalResolver.json",
+      "sha256": "6c9dd6278299075edfdcfadaa03da61b8b07419544242584b623c6c71606b232",
+      "bytes": 1417
+    },
+    {
+      "path": "contracts/deployments/eip155-84532/base-sepolia-2026.08.0/agentProfileResolver.json",
+      "sha256": "60475920fdc22957b15bee86d76d66425620e1583e508092c41db3a893f72fcc",
+      "bytes": 1399
+    },
+    {
+      "path": "contracts/deployments/eip155-84532/base-sepolia-2026.08.0/agentRegistryBase.json",
+      "sha256": "72e5d48330934290f9738a27bc1139d9429f90e2be5bbb68a8cb7b665bbfd86c",
+      "bytes": 1390
+    },
+    {
+      "path": "contracts/deployments/eip155-84532/base-sepolia-2026.08.0/agentRelationship.json",
+      "sha256": "ee4e344f763f633d3cfa2af00a8c6d713bfffcf994b975c07a7dc3378d806b0f",
+      "bytes": 1390
+    },
+    {
+      "path": "contracts/deployments/eip155-84532/base-sepolia-2026.08.0/agenticGovernance.json",
+      "sha256": "2f2d48968b4953aea8749a029999d0c0dea830326daa3812f7e7e82dbedda824",
+      "bytes": 1390
+    },
+    {
+      "path": "contracts/deployments/eip155-84532/base-sepolia-2026.08.0/agreementRegistry.json",
+      "sha256": "7e036614744b5f5c78468c0001ffd72207cdcdd22eb830b63673704027b8e3ac",
+      "bytes": 1390
+    },
+    {
+      "path": "contracts/deployments/eip155-84532/base-sepolia-2026.08.0/allowedMethodsEnforcer.json",
+      "sha256": "ef29e1a581b1c86c7f2776ae1f7d921bb50e19af8c95b491c1df25e07ae0e60a",
+      "bytes": 1405
+    },
+    {
+      "path": "contracts/deployments/eip155-84532/base-sepolia-2026.08.0/allowedTargetsEnforcer.json",
+      "sha256": "25bb00e0bdd3da8df8a20d8e21c615cb79dd56533322079975c01e1c438ac447",
+      "bytes": 1405
+    },
+    {
+      "path": "contracts/deployments/eip155-84532/base-sepolia-2026.08.0/approvedHashRegistry.json",
+      "sha256": "13e21389e32bd27547b425144737fb4b7db089b70514fda6b8b2d80b496fc85d",
+      "bytes": 1399
+    },
+    {
+      "path": "contracts/deployments/eip155-84532/base-sepolia-2026.08.0/attestationRegistry.json",
+      "sha256": "ceb84cefe6703f2d0affe28a21e50bb0334c1d4e67c426cd241c878137a1a141",
+      "bytes": 1396
+    },
+    {
+      "path": "contracts/deployments/eip155-84532/base-sepolia-2026.08.0/callDataHashEnforcer.json",
+      "sha256": "5e4485c29ba327ef0e0c76fa29455f9887108dd2d7d522900fad2f699cac7024",
+      "bytes": 1399
+    },
+    {
+      "path": "contracts/deployments/eip155-84532/base-sepolia-2026.08.0/custodyPolicy.json",
+      "sha256": "573147581e9b5b3b402d0bc1955b916bf63ea5fa879980de887404789648d0fa",
+      "bytes": 1378
+    },
+    {
+      "path": "contracts/deployments/eip155-84532/base-sepolia-2026.08.0/delegationManager.json",
+      "sha256": "9244250f7fdbd585b210eefd5b0c283db605deb3d1b58bbe6d9b21374d9539b4",
+      "bytes": 1390
+    },
+    {
+      "path": "contracts/deployments/eip155-84532/base-sepolia-2026.08.0/entryPoint.json",
+      "sha256": "898f1dff924a802ea01e7b3a9e6b18fea36bf38b751ffb7bcb677e2cd783e13d",
+      "bytes": 1279
+    },
+    {
+      "path": "contracts/deployments/eip155-84532/base-sepolia-2026.08.0/geoFeatureRegistry.json",
+      "sha256": "ca0eef9cae421db78d6eb951e739ca8b874e466160b7448b51fd8cab504c4aa2",
+      "bytes": 1393
+    },
+    {
+      "path": "contracts/deployments/eip155-84532/base-sepolia-2026.08.0/index.json",
+      "sha256": "991811756a770839f07ef9c86c39ac1857692aca5275fd83cef1e71ac13cad51",
+      "bytes": 6493
+    },
+    {
+      "path": "contracts/deployments/eip155-84532/base-sepolia-2026.08.0/mockUsdc.json",
+      "sha256": "3b736b61ca532c7cf7425beda9fafaed313f620776a6a3a8b2f58eeae1c48b06",
+      "bytes": 1363
+    },
+    {
+      "path": "contracts/deployments/eip155-84532/base-sepolia-2026.08.0/ontologyTermRegistry.json",
+      "sha256": "59a93581f858378f6788fb7cfa55fdba92cdec205bf92291320f2f8301f2de91",
+      "bytes": 1399
+    },
+    {
+      "path": "contracts/deployments/eip155-84532/base-sepolia-2026.08.0/paymentEnforcer.json",
+      "sha256": "a297cada74c6c0f8adc859e56028964bf86ea88d6c948967c93a168d02c0cffb",
+      "bytes": 1384
+    },
+    {
+      "path": "contracts/deployments/eip155-84532/base-sepolia-2026.08.0/paymentReceiptRegistry.json",
+      "sha256": "afdc0d32889c29a09209e0f4e684436a235f10f2e5d5cb4f5eed47ad13283f7c",
+      "bytes": 1405
+    },
+    {
+      "path": "contracts/deployments/eip155-84532/base-sepolia-2026.08.0/permissionlessSubregistry.json",
+      "sha256": "d16724878900031cde2e286984faedfca35b1aaf59f161068104893c93c710d2",
+      "bytes": 1414
+    },
+    {
+      "path": "contracts/deployments/eip155-84532/base-sepolia-2026.08.0/permissionlessSubregistryDemoAgent.json",
+      "sha256": "4484b9b4f3278b84c4a834bbad8ccaecc1ec4be744851b8a1a02243156477d1c",
+      "bytes": 1327
+    },
+    {
+      "path": "contracts/deployments/eip155-84532/base-sepolia-2026.08.0/quorumEnforcer.json",
+      "sha256": "10804665b3ee6c2c7734481dd6f26aee1687ce4775796b7d8f647ebf2fcb55b0",
+      "bytes": 1381
+    },
+    {
+      "path": "contracts/deployments/eip155-84532/base-sepolia-2026.08.0/relationshipTypeRegistry.json",
+      "sha256": "daf38492a8513d1a9c03b30414aa3e2231faee8427a4688433d28ed028cafcff",
+      "bytes": 1411
+    },
+    {
+      "path": "contracts/deployments/eip155-84532/base-sepolia-2026.08.0/shapeRegistry.json",
+      "sha256": "018779b5b8bce93d25c981366f47b4b01161c096318c5781eb23a16c7badbd8d",
+      "bytes": 1378
+    },
+    {
+      "path": "contracts/deployments/eip155-84532/base-sepolia-2026.08.0/skillDefinitionRegistry.json",
+      "sha256": "025005afd65841bebd3b2059291a534c4da9998ed4e58f709f8ac4a6cbfe6cfa",
+      "bytes": 1408
+    },
+    {
+      "path": "contracts/deployments/eip155-84532/base-sepolia-2026.08.0/smartAgentPaymaster.json",
+      "sha256": "c9e73ce7672c834582c59065cab17fd29c28b5ecae7f4248ad972ff28dd12173",
+      "bytes": 1396
+    },
+    {
+      "path": "contracts/deployments/eip155-84532/base-sepolia-2026.08.0/timelockController.json",
+      "sha256": "7a97622dcd25d9577f21464abc57b0936019e02b0669a4cdf16451e926054e9f",
+      "bytes": 1295
+    },
+    {
+      "path": "contracts/deployments/eip155-84532/base-sepolia-2026.08.0/timestampEnforcer.json",
+      "sha256": "068c3b4163993e9e870987d0a4c2a5bc04877ff18d0d17cce1add5ee4e9ce6c3",
+      "bytes": 1390
+    },
+    {
+      "path": "contracts/deployments/eip155-84532/base-sepolia-2026.08.0/universalSignatureValidator.json",
+      "sha256": "4a4c2f5d8b6fa3fde192a2f10faed4de713c67e8e325f27f2bd2b2a195b8b8ec",
+      "bytes": 1420
+    },
+    {
+      "path": "contracts/deployments/eip155-84532/base-sepolia-2026.08.0/valueEnforcer.json",
+      "sha256": "cd5c52d78b31f30b23dbfb2f9bb04d5a8c2fbb79ec6f85c35f924851496ab0bf",
+      "bytes": 1378
+    },
+    {
+      "path": "schemas/agentic-lock.schema.json",
+      "sha256": "144627c252bc08a03879dd994c6706da51e293285e2064868cf5d1841b408de2",
+      "bytes": 925
+    },
+    {
+      "path": "schemas/contract-deployment.schema.json",
+      "sha256": "e8f980b1bcb92ae1199238d11e497d45a9d13dd6e51c5aa7bf8b4b91772fdffd",
+      "bytes": 1770
+    },
+    {
+      "path": "schemas/release-manifest.schema.json",
+      "sha256": "2f451646a387f4ff7f033232b39687bc4eb6d0ea7651d6313d98cb365f115ab6",
+      "bytes": 2094
+    },
+    {
+      "path": "skills/README.md",
+      "sha256": "d361eee8cb5827fcd32adc77480902e6f43bb03b829a65778be68c1a7a56496f",
+      "bytes": 500
+    },
+    {
+      "path": "skills/agenticprimitives-a2a-service/SKILL.md",
+      "sha256": "5f69ecc2872ca605748bcbac1b2569e9d1ec42b512885008b5f2b488263a0c0a",
+      "bytes": 1333
+    },
+    {
+      "path": "skills/agenticprimitives-a2a-service/references/README.md",
+      "sha256": "56692a0cb3a1c6fa5adfc677df0c7a1be940fc3d973497fc0868e1f64384a4e7",
+      "bytes": 220
+    },
+    {
+      "path": "skills/agenticprimitives-bootstrap/SKILL.md",
+      "sha256": "624471fb5c207691ee0ed87510cf98b9de79eb9d6326088283fe4273ed854153",
+      "bytes": 1796
+    },
+    {
+      "path": "skills/agenticprimitives-bootstrap/references/README.md",
+      "sha256": "b9d7c6073a4ad72f2758f03c6186575f25c925fff1a46d3f20c9305ca4e3efa3",
+      "bytes": 218
+    },
+    {
+      "path": "skills/agenticprimitives-bootstrap/references/decision-checklist.md",
+      "sha256": "0f04dbf968065cd034bc065b56ffd81206d40360956267c1df7b30b55079ea6e",
+      "bytes": 346
+    },
+    {
+      "path": "skills/agenticprimitives-contract-integration/SKILL.md",
+      "sha256": "acb5d38cd51397cb359750437d10ed59682a87f2fad6d144bc0ec4b7ed68dee3",
+      "bytes": 1661
+    },
+    {
+      "path": "skills/agenticprimitives-contract-integration/references/README.md",
+      "sha256": "c439779fe28bc87c35b2cac4ba23f3ea123b7b314b9ce476d1a073bfaec74ee9",
+      "bytes": 229
+    },
+    {
+      "path": "skills/agenticprimitives-contract-integration/references/verification-checklist.md",
+      "sha256": "8a3f085cd66d0960d162bd0598d57a0d02bc6632e96e5e712733bf609b0616f9",
+      "bytes": 356
+    },
+    {
+      "path": "skills/agenticprimitives-delegation-design/SKILL.md",
+      "sha256": "e05b84d3a9929aac7e7a13a2850cc860d356359cf74aee42842933c426e05aed",
+      "bytes": 1263
+    },
+    {
+      "path": "skills/agenticprimitives-delegation-design/references/README.md",
+      "sha256": "a8894eddcce15748b37787556bc2dace5c1f95fa8bab995c1b40a8514e3a5117",
+      "bytes": 226
+    },
+    {
+      "path": "skills/agenticprimitives-faith-solution/SKILL.md",
+      "sha256": "7e1ca0bfbf67fedc71fbb15ed4ab5fc83bd48b02fca40f8e835f4da56377eca8",
+      "bytes": 1631
+    },
+    {
+      "path": "skills/agenticprimitives-faith-solution/references/README.md",
+      "sha256": "f2f75749c9604d2faa5f5868b7f2d6d1eb94371013e232aec1328edb99809d3b",
+      "bytes": 223
+    },
+    {
+      "path": "skills/agenticprimitives-mcp-service/SKILL.md",
+      "sha256": "6e8ac3c55884e2022578cf7664f2840347d03e5fdec50c861a2c06e52af9b677",
+      "bytes": 1238
+    },
+    {
+      "path": "skills/agenticprimitives-mcp-service/references/README.md",
+      "sha256": "99248eddc79fe5d4665a1f0eaa362fccb4a25ff6afce2664ab00cb0adf7b9b38",
+      "bytes": 220
+    },
+    {
+      "path": "skills/agenticprimitives-ontology-modeling/SKILL.md",
+      "sha256": "9ddaa28a6113718c14c56e0ffb2336c2072b45628017108845e5771dcaf3941b",
+      "bytes": 1247
+    },
+    {
+      "path": "skills/agenticprimitives-ontology-modeling/references/README.md",
+      "sha256": "dddecd7ee5a511b940cddc40e0c02d854108b927a08da5b56407685d992ac5a2",
+      "bytes": 226
+    },
+    {
+      "path": "skills/agenticprimitives-ontology-modeling/references/semantic-boundaries.md",
+      "sha256": "21433fe7fdb448842ae2caaac79c6994c5d7b630ed074363337b6491c86585d7",
+      "bytes": 343
+    },
+    {
+      "path": "skills/agenticprimitives-package-architecture/SKILL.md",
+      "sha256": "6f60e02a3df1b23f4a2f58574710f44528394641a41571e17f0f4012b3637615",
+      "bytes": 1114
+    },
+    {
+      "path": "skills/agenticprimitives-package-architecture/references/README.md",
+      "sha256": "f31670fedacb245bf4b72b70cd964634768abee245f720d810cf2c794775caba",
+      "bytes": 229
+    },
+    {
+      "path": "skills/agenticprimitives-package-architecture/references/package-selection.md",
+      "sha256": "3148e76414541f19f96ec7a80e9a8a6a50464de128b38990714f7648206efce1",
+      "bytes": 247
+    },
+    {
+      "path": "skills/agenticprimitives-release-verification/SKILL.md",
+      "sha256": "3966ebd654a164bebca61ce6fa8de277e8722b9c44cc309bdd52092e379a3bda",
+      "bytes": 1266
+    },
+    {
+      "path": "skills/agenticprimitives-release-verification/references/README.md",
+      "sha256": "5db82aa73a0b58a8a279e93b6df542b2e34386f5c141e685d7b70ba2f2363b8c",
+      "bytes": 229
+    },
+    {
+      "path": "skills/agenticprimitives-security-review/SKILL.md",
+      "sha256": "a71862e84662cc566202233ae26f2e42e2b9e55f6dd19431504219c1bcc040d1",
+      "bytes": 1332
+    },
+    {
+      "path": "skills/agenticprimitives-security-review/references/README.md",
+      "sha256": "2ce06d57c758af1bcff7003c0de449d3f870c8f6d5a1dd35a2f0840c0153289a",
+      "bytes": 224
+    },
+    {
+      "path": "skills/agenticprimitives-smart-agent-account/SKILL.md",
+      "sha256": "1d587f71da46b2ea781e00b49dc54bad9c4015c93f65dbb011a3ff6deda33221",
+      "bytes": 1333
+    },
+    {
+      "path": "skills/agenticprimitives-smart-agent-account/references/README.md",
+      "sha256": "0c7ce72e60ccd9309ff54e8b2067d4d2a72f5ce66469809d71e8f89e0f228f1b",
+      "bytes": 228
+    },
+    {
+      "path": "skills/agenticprimitives-test-and-debug/SKILL.md",
+      "sha256": "b2297c4089834e395c13de8322f7f6e36aef9ff8154dc0ffefd61610ccc35db4",
+      "bytes": 1232
+    },
+    {
+      "path": "skills/agenticprimitives-test-and-debug/references/README.md",
+      "sha256": "5fb63a95c3b0fa285c16eea1388e00af7a53df024861609ab020af1d0ddb0663",
+      "bytes": 223
+    },
+    {
+      "path": "skills/agenticprimitives-upgrade-and-migrate/SKILL.md",
+      "sha256": "e2896822f614cdcd45d8c633da20cd807dc55b757b7d3d83dd7cf5375fdf4299",
+      "bytes": 1291
+    },
+    {
+      "path": "skills/agenticprimitives-upgrade-and-migrate/references/README.md",
+      "sha256": "544d70345b869f03e27a9038cd6fe6f31e32285b6c1c4e1e084140e7f2d535d0",
+      "bytes": 228
+    }
+  ]
+}

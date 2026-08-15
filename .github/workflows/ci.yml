@@ -1,0 +1,103 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    # Daily — the live rails and the published packages change without this repo changing.
+    - cron: '17 6 * * *'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  typecheck:
+    name: Typecheck + CLI smoke test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+      - run: node packages/create-primitives-app/test/smoke.mjs
+
+  template-drift:
+    name: CLI templates match live wrappers
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: node packages/create-primitives-app/scripts/sync-templates.mjs
+      - name: Fail if templates drifted
+        run: |
+          if ! git diff --quiet -- packages/create-primitives-app/templates; then
+            echo "::error::templates/ is out of date — run: pnpm --filter create-primitives-app sync-templates"
+            git diff --stat -- packages/create-primitives-app/templates
+            exit 1
+          fi
+
+  scaffold:
+    name: Scaffolded project installs, typechecks, builds
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Scaffold
+        run: |
+          node packages/create-primitives-app/bin/cli.js "$RUNNER_TEMP/scaffold-ci" \
+            --yes --name "Scaffold CI" --client-id scaffold-ci --skip-install --no-git
+      - name: Install, typecheck, build
+        working-directory: ${{ runner.temp }}/scaffold-ci
+        run: |
+          pnpm install
+          pnpm typecheck
+          pnpm build
+
+  release-binding:
+    name: Release surfaces + Developer MCP
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Skill projections are in sync
+        run: pnpm skills:check
+      - name: Release is internally consistent
+        run: pnpm release:validate
+      - name: Developer MCP handshake and tools
+        run: node test/smoke.mjs
+        working-directory: packages/dev-mcp
+
+  live-rails:
+    name: Live endpoints + published packages
+    runs-on: ubuntu-latest
+    # The rails are real infrastructure this repo does not control. Red here means
+    # "the world moved" — fix the docs, not the build.
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm check:endpoints
+      - run: pnpm check:packages
+      - name: Doctor — npm pins, rails, on-chain runtime code
+        run: pnpm doctor:full

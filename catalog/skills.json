@@ -1,0 +1,23 @@
+{
+  "schemaVersion": "1.0.0",
+  "release": "2026.08.0-pilot.1",
+  "pack": "developer-core",
+  "packVersion": "1.0.0",
+  "kind": "developer",
+  "note": "Developer skills guide Claude/Cursor while building. Runtime skills are a separate, authority-gated surface.",
+  "skills": [
+    "agenticprimitives-a2a-service",
+    "agenticprimitives-bootstrap",
+    "agenticprimitives-contract-integration",
+    "agenticprimitives-delegation-design",
+    "agenticprimitives-faith-solution",
+    "agenticprimitives-mcp-service",
+    "agenticprimitives-ontology-modeling",
+    "agenticprimitives-package-architecture",
+    "agenticprimitives-release-verification",
+    "agenticprimitives-security-review",
+    "agenticprimitives-smart-agent-account",
+    "agenticprimitives-test-and-debug",
+    "agenticprimitives-upgrade-and-migrate"
+  ]
+}

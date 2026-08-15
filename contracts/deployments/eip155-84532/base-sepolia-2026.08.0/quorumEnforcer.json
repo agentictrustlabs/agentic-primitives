@@ -1,0 +1,40 @@
+{
+  "$schema": "../../../../schemas/contract-deployment.schema.json",
+  "schemaVersion": "1.0.0",
+  "logicalName": "quorumEnforcer",
+  "canonicalId": "eip155:84532/quorumEnforcer@base-sepolia-2026.08.0",
+  "contractVersion": "1.0.0-alpha.21",
+  "status": "pilot",
+  "chain": {
+    "caip2": "eip155:84532",
+    "chainId": 84532,
+    "name": "Base Sepolia"
+  },
+  "address": "0xA4b148EfF1Ff1c116849F6e9D9c0059bC644873F",
+  "proxy": null,
+  "source": {
+    "package": "@agenticprimitives/contracts",
+    "packageVersion": "1.0.0-alpha.21",
+    "repository": "git+https://github.com/agentictrustlabs/agenticprimitives.git",
+    "recordedFrom": "deployments-base-sepolia.json"
+  },
+  "compiler": {
+    "toolchain": "foundry",
+    "details": "see @agenticprimitives/contracts build metadata"
+  },
+  "artifacts": {
+    "abi": "contracts/abis/QuorumEnforcer.json",
+    "abiSha256": "4c4ddecef04a08224fde800f3c731ed861a1cdbb711dc12166c86dd1060e3ff1"
+  },
+  "deployment": {
+    "deployer": "0x31ed17fb99e82E02085Ab4B3cbdaB05489098b44",
+    "transactionHash": null,
+    "blockNumber": null,
+    "note": "tx/block provenance lives in the canonical deploy pipeline; this record is resolved from the published package"
+  },
+  "verification": {
+    "runtimeCodePresent": null,
+    "lastCheckedAt": null,
+    "method": "scripts/doctor.mjs --verify-code (eth_getCode against the public RPC)"
+  }
+}

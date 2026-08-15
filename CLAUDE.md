@@ -12,11 +12,18 @@ apps/commons              the example app: one Cloudflare Worker + a React SPA, 
   src/worker/session.ts     AES-GCM sealed httpOnly cookie; no credential reaches JS
   src/worker/orgs.ts        which orgs this person linked to this app, and their wires
   src/ui/                   the SPA — its only API is this app's own /api/*
+packages/create-primitives-app   npx create-primitives-app — scaffold a product monorepo
 packages/home-connect     relying-app OIDC: startConnect → completeConnect
 packages/interactions-client  typed ops: topics, messages, library, inbox
 packages/catalog          every published @agenticprimitives package, import-checked
-docs/                     principles, architecture, API reference, troubleshooting
-scripts/                  check-endpoints.mjs, check-packages.mjs
+packages/dev-mcp          read-only Developer MCP server — release facts as tools
+release-manifest.json     the release binding: pins, deployments, skills, endpoints
+catalog/                  packages.json, contracts.json, skills.json — generated indexes
+contracts/                abis/ + per-contract deployment records (generated)
+skills/                   13 developer Agent Skills, projected to .claude/.cursor/.agents
+docs/                     principles, architecture, SDK, CLI, API, troubleshooting
+scripts/                  check-endpoints, check-packages, generate/validate-release, doctor
+llms.txt                  machine-readable doc index
 ```
 
 ## Where to look, by intent
@@ -24,11 +31,16 @@ scripts/                  check-endpoints.mjs, check-packages.mjs
 | Working on | Read |
 | --- | --- |
 | Anything, first time | `docs/principles.md`, then `apps/commons/src/worker/index.ts` |
+| Starting a **new product** | `docs/getting-started.md` + `npx create-primitives-app` — do not fork Commons |
 | Sign-in / OIDC / issuers | `packages/home-connect/src/connect.ts` + `origins.ts` |
 | A new interactions op | `docs/interactions-api.md`, then `packages/interactions-client/src/client.ts` |
+| npm packages a builder imports | `docs/sdk.md` |
 | A refusal you do not understand | `docs/troubleshooting.md` — most are ceremonies, not bugs |
 | Which package does X | `docs/packages.md` |
 | Contract addresses, delegation hashes | `docs/contracts.md` |
+| Which exact versions belong together | `release-manifest.json` + `docs/release-binding.md` |
+| Resolving an address or ABI | `contracts/deployments/` records — never copy from prose |
+| Task-specific procedure | the matching skill in `skills/` |
 | Registering an app at a Home | `docs/register-your-app.md` |
 
 ## The distinction everything rests on
@@ -65,6 +77,8 @@ someone else. Neither substitutes for the other, and the gate checks both indepe
 pnpm typecheck              # all workspace packages
 pnpm check:endpoints        # the live rails, ~5s — catches drift nothing else can
 pnpm check:packages         # all 66 published packages, imported for real
+pnpm release:validate       # release surfaces consistent, ABI digests, override pins
+pnpm doctor:full            # npm pins + endpoints + eth_getCode per deployment
 pnpm --filter @starter/commons build
 ```
 

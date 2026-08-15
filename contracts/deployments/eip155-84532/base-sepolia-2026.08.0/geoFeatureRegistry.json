@@ -1,0 +1,40 @@
+{
+  "$schema": "../../../../schemas/contract-deployment.schema.json",
+  "schemaVersion": "1.0.0",
+  "logicalName": "geoFeatureRegistry",
+  "canonicalId": "eip155:84532/geoFeatureRegistry@base-sepolia-2026.08.0",
+  "contractVersion": "1.0.0-alpha.21",
+  "status": "pilot",
+  "chain": {
+    "caip2": "eip155:84532",
+    "chainId": 84532,
+    "name": "Base Sepolia"
+  },
+  "address": "0x7D4F6F5cca1cDb1c72b25c50aB80Fb9629BA800B",
+  "proxy": null,
+  "source": {
+    "package": "@agenticprimitives/contracts",
+    "packageVersion": "1.0.0-alpha.21",
+    "repository": "git+https://github.com/agentictrustlabs/agenticprimitives.git",
+    "recordedFrom": "deployments-base-sepolia.json"
+  },
+  "compiler": {
+    "toolchain": "foundry",
+    "details": "see @agenticprimitives/contracts build metadata"
+  },
+  "artifacts": {
+    "abi": "contracts/abis/GeoFeatureRegistry.json",
+    "abiSha256": "bc5aebda6e870cb21311f5d76fb356a9ffef9f63c058c565f1c5687699f098e9"
+  },
+  "deployment": {
+    "deployer": "0x31ed17fb99e82E02085Ab4B3cbdaB05489098b44",
+    "transactionHash": null,
+    "blockNumber": null,
+    "note": "tx/block provenance lives in the canonical deploy pipeline; this record is resolved from the published package"
+  },
+  "verification": {
+    "runtimeCodePresent": null,
+    "lastCheckedAt": null,
+    "method": "scripts/doctor.mjs --verify-code (eth_getCode against the public RPC)"
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "$schema": "../../../../schemas/contract-deployment.schema.json",
+  "schemaVersion": "1.0.0",
+  "logicalName": "callDataHashEnforcer",
+  "canonicalId": "eip155:84532/callDataHashEnforcer@base-sepolia-2026.08.0",
+  "contractVersion": "1.0.0-alpha.21",
+  "status": "pilot",
+  "chain": {
+    "caip2": "eip155:84532",
+    "chainId": 84532,
+    "name": "Base Sepolia"
+  },
+  "address": "0xA614d6E5ECebc308b4e0bABDC7c832da059bb132",
+  "proxy": null,
+  "source": {
+    "package": "@agenticprimitives/contracts",
+    "packageVersion": "1.0.0-alpha.21",
+    "repository": "git+https://github.com/agentictrustlabs/agenticprimitives.git",
+    "recordedFrom": "deployments-base-sepolia.json"
+  },
+  "compiler": {
+    "toolchain": "foundry",
+    "details": "see @agenticprimitives/contracts build metadata"
+  },
+  "artifacts": {
+    "abi": "contracts/abis/CallDataHashEnforcer.json",
+    "abiSha256": "61b766ecee830c57c5da17a7a0cd69fb6274a370d5e2ecfeb09d162fea945e65"
+  },
+  "deployment": {
+    "deployer": "0x31ed17fb99e82E02085Ab4B3cbdaB05489098b44",
+    "transactionHash": null,
+    "blockNumber": null,
+    "note": "tx/block provenance lives in the canonical deploy pipeline; this record is resolved from the published package"
+  },
+  "verification": {
+    "runtimeCodePresent": null,
+    "lastCheckedAt": null,
+    "method": "scripts/doctor.mjs --verify-code (eth_getCode against the public RPC)"
+  }
+}

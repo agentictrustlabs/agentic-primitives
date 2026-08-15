@@ -1,0 +1,38 @@
+{
+  "name": "@app/web",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "__PROJECT_NAME__ — Worker + SPA on the Agentic Primitives substrate. No database.",
+  "scripts": {
+    "dev": "concurrently -k -n vite,worker -c cyan,magenta \"vite build --watch\" \"wrangler dev\"",
+    "build": "vite build",
+    "deploy": "vite build && wrangler deploy",
+    "typecheck": "tsc -p tsconfig.json && tsc -p tsconfig.ui.json",
+    "test": "echo \"(no tests)\""
+  },
+  "dependencies": {
+    "@agenticprimitives/agent-account": "1.0.0-alpha.21",
+    "@agenticprimitives/connect-auth": "1.0.0-alpha.21",
+    "@agenticprimitives/contracts": "1.0.0-alpha.21",
+    "@agenticprimitives/delegation": "1.0.0-alpha.21",
+    "@agenticprimitives/key-custody": "1.0.0-alpha.21",
+    "@agenticprimitives/types": "1.0.0-alpha.21",
+    "@starter/home-connect": "workspace:*",
+    "@starter/interactions-client": "workspace:*",
+    "hono": "^4.6.14",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "viem": "^2.52.2"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20260811.1",
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
+    "@vitejs/plugin-react": "^4.3.4",
+    "concurrently": "^9.1.0",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.11",
+    "wrangler": "^4.0.0"
+  }
+}

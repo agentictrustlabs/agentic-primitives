@@ -1,0 +1,59 @@
+---
+description: Binding rules for building on the Agentic Primitives substrate
+globs: ["**/*.ts", "**/*.tsx"]
+alwaysApply: true
+---
+
+# Agentic Primitives — the four rules
+
+This looks like a normal OAuth + REST app. It is not one. The patterns you reach for by default are
+the ones this substrate exists to replace.
+
+## 1. A token is not authority
+
+The OIDC `id_token` proves **who**. It authorizes nothing. Authority is a separate on-chain
+delegation the person or organization signed, verified by ERC-1271 + caveats + an on-chain
+revocation check, on every call.
+
+Never gate a capability on a claim, a scope string, or an audience. Never put `role` or `isAdmin` on
+a session object.
+
+```ts
+{ session: idToken,            // WHO
+  stewardship: delegationWire } // MAY they act as this organization
+```
+
+## 2. Records belong to the owner, not the app
+
+No database, table, KV namespace, or Durable Object for user content. Topics, posts, messages and
+library artifacts go in the **owner's** vault via `@starter/interactions-client`.
+
+Derived, rebuildable state is fine. The test: *if this store were wiped, is the loss a rebuild or a
+bereavement?*
+
+## 3. No fallback chains
+
+One mechanism per read or auth path. Empty is an answer. Never `try X ?? try Y`, never
+"strong check failed, use the weak one". Bounded retries of the **same** call are fine.
+
+## 4. A refusal is usually a missing ceremony
+
+`storage_not_enabled` · `messaging_not_approved` · `read_grant_absent` · `wire_absent` all mean a
+person must sign something at their **Home** with a credential that does not exist on this origin.
+Render a link. Never retry, never work around, never fake success.
+
+`owner_only` means the operation belongs to the person alone. Redesign the feature; do not route
+around the gate.
+
+# Also
+
+- Privileged calls run **server-side**. The browser gets an `httpOnly` cookie it cannot read.
+- The address is the identity; a name is a transferable facet. Resolve names at the edge.
+- No hostnames in `packages/*` — the app injects them (`apps/commons/src/worker/config.ts`).
+- Use the published packages for anything touching authority. Never hand-roll an EIP-712 struct or
+  a signature check.
+- A named person's Home is their **subdomain**. Accept the apex and single-label subdomains of the
+  zone; nothing else. Never widen this to make a login work.
+- Message bodies travel separately from envelopes, keyed by message id.
+
+Full rules: `docs/principles.md`. Worked example: `apps/commons/src/worker/index.ts`.

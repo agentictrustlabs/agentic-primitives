@@ -1,0 +1,15 @@
+[
+  {
+    "type": "function",
+    "name": "isAgenticPrimitivesAgentAccount",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "bool",
+        "internalType": "bool"
+      }
+    ],
+    "stateMutability": "pure"
+  }
+]

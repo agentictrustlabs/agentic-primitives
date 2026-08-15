@@ -1,0 +1,51 @@
+name: Bug report
+description: Something in this kit is broken — the CLI, a wrapper, the example, or a doc that lies.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Before filing: most refusals are **ceremonies**, not bugs — check
+        [troubleshooting](../../docs/troubleshooting.md). And run `pnpm check:endpoints`.
+  - type: dropdown
+    id: surface
+    attributes:
+      label: Surface
+      options:
+        - create-primitives-app (CLI / scaffold output)
+        - packages/home-connect
+        - packages/interactions-client
+        - apps/commons (example)
+        - docs (a claim that is not true)
+        - live rails (Home / A2A / MCP)
+    validations:
+      required: true
+  - type: input
+    id: code
+    attributes:
+      label: Refusal code (if any)
+      description: The `code` field on the error — e.g. `storage_not_enabled`, `not_authorized`.
+      placeholder: storage_not_enabled
+  - type: textarea
+    id: repro
+    attributes:
+      label: Reproduction
+      description: Exact commands or calls. For CLI issues, the full command line and Node version.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected vs actual
+    validations:
+      required: true
+  - type: dropdown
+    id: endpoints
+    attributes:
+      label: Does `pnpm check:endpoints` pass?
+      options:
+        - "yes"
+        - "no"
+        - not applicable
+    validations:
+      required: true

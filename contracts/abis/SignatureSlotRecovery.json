@@ -1,0 +1,88 @@
+[
+  {
+    "type": "error",
+    "name": "ApprovedHashRequired",
+    "inputs": [
+      {
+        "name": "signer",
+        "type": "address",
+        "internalType": "address"
+      }
+    ]
+  },
+  {
+    "type": "error",
+    "name": "ContractSigInvalid",
+    "inputs": [
+      {
+        "name": "signer",
+        "type": "address",
+        "internalType": "address"
+      }
+    ]
+  },
+  {
+    "type": "error",
+    "name": "InvalidSignature",
+    "inputs": [
+      {
+        "name": "v",
+        "type": "uint8",
+        "internalType": "uint8"
+      }
+    ]
+  },
+  {
+    "type": "error",
+    "name": "PasskeyPubKeyMismatch",
+    "inputs": [
+      {
+        "name": "claimed",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "derived",
+        "type": "address",
+        "internalType": "address"
+      }
+    ]
+  },
+  {
+    "type": "error",
+    "name": "PasskeySigInvalid",
+    "inputs": [
+      {
+        "name": "signer",
+        "type": "address",
+        "internalType": "address"
+      }
+    ]
+  },
+  {
+    "type": "error",
+    "name": "SigTailOutOfBounds",
+    "inputs": [
+      {
+        "name": "v",
+        "type": "uint8",
+        "internalType": "uint8"
+      },
+      {
+        "name": "sigOffset",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "sigLen",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "totalLen",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ]
+  }
+]

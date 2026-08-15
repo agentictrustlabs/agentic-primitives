@@ -1,0 +1,41 @@
+{
+  "name": "__PACKAGE_NAME__",
+  "version": "0.1.0",
+  "private": true,
+  "description": "__PROJECT_NAME__ — an app on the Agentic Primitives substrate.",
+  "license": "MIT",
+  "type": "module",
+  "packageManager": "pnpm@9.12.3",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "pnpm --filter @app/web dev",
+    "build": "pnpm --filter @app/web build",
+    "deploy": "pnpm --filter @app/web deploy",
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm -r test",
+    "check": "pnpm typecheck && pnpm test",
+    "check:endpoints": "node scripts/check-endpoints.mjs"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3"
+  },
+  "pnpm": {
+    "overrides": {
+      "@agenticprimitives/a2a": "0.0.0-alpha.18",
+      "@agenticprimitives/agent-account": "1.0.0-alpha.21",
+      "@agenticprimitives/agent-naming": "1.0.0-alpha.21",
+      "@agenticprimitives/agent-profile": "1.0.0-alpha.21",
+      "@agenticprimitives/agent-relationships": "1.0.0-alpha.21",
+      "@agenticprimitives/audit": "1.0.0-alpha.21",
+      "@agenticprimitives/connect-client": "1.0.0-alpha.10",
+      "@agenticprimitives/content-primitives": "1.0.0-alpha.22",
+      "@agenticprimitives/contracts": "1.0.0-alpha.21",
+      "@agenticprimitives/delegation": "1.0.0-alpha.21",
+      "@agenticprimitives/fabric": "0.0.0-alpha.10",
+      "@agenticprimitives/home": "0.0.0-alpha.10",
+      "@agenticprimitives/types": "1.0.0-alpha.21"
+    }
+  }
+}

@@ -1,0 +1,111 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agenticprimitives.dev/schemas/release-manifest.schema.json",
+  "title": "Agentic Primitives Developer Kit release manifest",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "release",
+    "status",
+    "sources",
+    "compatibility",
+    "supportedChains",
+    "packages",
+    "contractReleases",
+    "ontologyProfiles",
+    "skillPacks"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "type": "string"
+    },
+    "release": {
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "example",
+        "experimental",
+        "pilot",
+        "stable",
+        "deprecated",
+        "quarantined"
+      ]
+    },
+    "exampleOnly": {
+      "type": "boolean"
+    },
+    "generatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "sources": {
+      "type": "object"
+    },
+    "compatibility": {
+      "type": "object"
+    },
+    "supportedChains": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/chain"
+      }
+    },
+    "packages": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "contractReleases": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "ontologyProfiles": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "skillPacks": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    }
+  },
+  "$defs": {
+    "chain": {
+      "type": "object",
+      "required": [
+        "caip2",
+        "chainId",
+        "name",
+        "tier",
+        "deploymentRelease"
+      ],
+      "properties": {
+        "caip2": {
+          "type": "string",
+          "pattern": "^eip155:[0-9]+$"
+        },
+        "chainId": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "name": {
+          "type": "string"
+        },
+        "tier": {
+          "type": "string"
+        },
+        "deploymentRelease": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "additionalProperties": true
+}

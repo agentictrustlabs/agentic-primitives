@@ -1,0 +1,41 @@
+{
+  "name": "create-primitives-app",
+  "version": "0.1.0",
+  "description": "Scaffold a pnpm monorepo for building on the Agentic Primitives substrate — Home connect, A2A/MCP vault, pinned @agenticprimitives packages, and Claude/Cursor rules.",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "create-primitives-app": "./bin/cli.js"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "bin",
+    "src",
+    "templates"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "typecheck": "echo \"(plain JS)\"",
+    "test": "node test/smoke.mjs",
+    "sync-templates": "node scripts/sync-templates.mjs",
+    "prepublishOnly": "node scripts/sync-templates.mjs && node test/smoke.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/agentictrustlabs/agentic-primitives.git",
+    "directory": "packages/create-primitives-app"
+  },
+  "keywords": [
+    "agenticprimitives",
+    "create",
+    "scaffold",
+    "ethereum",
+    "delegation",
+    "mcp",
+    "a2a"
+  ]
+}

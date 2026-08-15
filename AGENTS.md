@@ -7,6 +7,8 @@ Cursor loads the same content from `.cursor/rules/`; Claude reads `CLAUDE.md`, w
 
 1. [`docs/principles.md`](docs/principles.md) — twelve rules, each enforced by a real gate.
 2. `apps/commons/src/worker/index.ts` — a complete, working example of every pattern.
+   In a project from `create-primitives-app`, read `apps/web/src/worker/index.ts` instead — that is
+   the product. Commons stays in the public starter as the example.
 
 ## The four instincts to override
 
@@ -52,6 +54,18 @@ this origin. Render a link. Never retry, never work around, never fake success.
 `owner_only` means you reached an operation that belongs to the person alone. Working as designed —
 redesign the feature, do not route around the gate.
 
+## Versions and addresses: resolve, never copy
+
+`release-manifest.json` binds the package pins, the contract deployment records, and the
+live endpoints for this release. When you need a version, read `catalog/packages.json`.
+When you need a contract address or ABI, read its record under `contracts/deployments/`
+— never a constant from prose, however plausible. `docs/release-binding.md` explains the
+whole surface.
+
+Focused skills live in `skills/` (projected into `.claude/skills/`, `.cursor/skills/`,
+`.agents/skills/`) — load the one matching your task instead of guessing procedure. The
+read-only Developer MCP server (`packages/dev-mcp`) serves the same facts as tools.
+
 ## Repo conventions
 
 - TypeScript strict, ESM, Node ≥ 20. `noUncheckedIndexedAccess` is on.
@@ -69,6 +83,7 @@ redesign the feature, do not route around the gate.
 pnpm typecheck
 pnpm check:endpoints    # the live rails are real and they change
 pnpm check:packages
+pnpm release:validate   # release surfaces agree with each other and pnpm.overrides
 ```
 
 If `check:endpoints` disagrees with `docs/live-endpoints.md`, **believe the endpoint** and fix the

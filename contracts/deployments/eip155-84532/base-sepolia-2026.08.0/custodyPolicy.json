@@ -1,0 +1,40 @@
+{
+  "$schema": "../../../../schemas/contract-deployment.schema.json",
+  "schemaVersion": "1.0.0",
+  "logicalName": "custodyPolicy",
+  "canonicalId": "eip155:84532/custodyPolicy@base-sepolia-2026.08.0",
+  "contractVersion": "1.0.0-alpha.21",
+  "status": "pilot",
+  "chain": {
+    "caip2": "eip155:84532",
+    "chainId": 84532,
+    "name": "Base Sepolia"
+  },
+  "address": "0x5DB542eeBa652372afE6B4b0Cd40D999e65846de",
+  "proxy": null,
+  "source": {
+    "package": "@agenticprimitives/contracts",
+    "packageVersion": "1.0.0-alpha.21",
+    "repository": "git+https://github.com/agentictrustlabs/agenticprimitives.git",
+    "recordedFrom": "deployments-base-sepolia.json"
+  },
+  "compiler": {
+    "toolchain": "foundry",
+    "details": "see @agenticprimitives/contracts build metadata"
+  },
+  "artifacts": {
+    "abi": "contracts/abis/CustodyPolicy.json",
+    "abiSha256": "b1e5ee85e17ea9f25456465eb6cb8428296264b3e8e4feb8a8462c4a9cffe08e"
+  },
+  "deployment": {
+    "deployer": "0x31ed17fb99e82E02085Ab4B3cbdaB05489098b44",
+    "transactionHash": null,
+    "blockNumber": null,
+    "note": "tx/block provenance lives in the canonical deploy pipeline; this record is resolved from the published package"
+  },
+  "verification": {
+    "runtimeCodePresent": null,
+    "lastCheckedAt": null,
+    "method": "scripts/doctor.mjs --verify-code (eth_getCode against the public RPC)"
+  }
+}

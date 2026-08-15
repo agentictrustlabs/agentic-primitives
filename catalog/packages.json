@@ -1,0 +1,269 @@
+{
+  "schemaVersion": "1.0.0",
+  "release": "2026.08.0-pilot.1",
+  "registry": "https://registry.npmjs.org",
+  "count": 65,
+  "pinnedBy": "agentic-primitives/packages/catalog/package.json",
+  "packages": [
+    {
+      "name": "@agenticprimitives/a2a",
+      "version": "0.0.0-alpha.18"
+    },
+    {
+      "name": "@agenticprimitives/account-custody",
+      "version": "1.0.0-alpha.21"
+    },
+    {
+      "name": "@agenticprimitives/admission",
+      "version": "0.0.0-alpha.2"
+    },
+    {
+      "name": "@agenticprimitives/agent-account",
+      "version": "1.0.0-alpha.21"
+    },
+    {
+      "name": "@agenticprimitives/agent-naming",
+      "version": "1.0.0-alpha.21"
+    },
+    {
+      "name": "@agenticprimitives/agent-profile",
+      "version": "1.0.0-alpha.21"
+    },
+    {
+      "name": "@agenticprimitives/agent-relationships",
+      "version": "1.0.0-alpha.21"
+    },
+    {
+      "name": "@agenticprimitives/agent-resolution",
+      "version": "0.0.0-alpha.2"
+    },
+    {
+      "name": "@agenticprimitives/agent-skills",
+      "version": "0.0.0-alpha.18"
+    },
+    {
+      "name": "@agenticprimitives/agentic-authorization",
+      "version": "0.0.0-alpha.1"
+    },
+    {
+      "name": "@agenticprimitives/agreements",
+      "version": "0.0.0-alpha.18"
+    },
+    {
+      "name": "@agenticprimitives/ap-kms",
+      "version": "0.0.0-alpha.12"
+    },
+    {
+      "name": "@agenticprimitives/attestations",
+      "version": "0.0.0-alpha.17"
+    },
+    {
+      "name": "@agenticprimitives/audit",
+      "version": "1.0.0-alpha.21"
+    },
+    {
+      "name": "@agenticprimitives/browser-identity",
+      "version": "1.0.0-alpha.6"
+    },
+    {
+      "name": "@agenticprimitives/capability-claims",
+      "version": "0.0.0-alpha.18"
+    },
+    {
+      "name": "@agenticprimitives/chain-state",
+      "version": "0.0.0-alpha.1"
+    },
+    {
+      "name": "@agenticprimitives/chain-state-viem",
+      "version": "0.0.0-alpha.3"
+    },
+    {
+      "name": "@agenticprimitives/connect",
+      "version": "1.0.0-alpha.21"
+    },
+    {
+      "name": "@agenticprimitives/connect-auth",
+      "version": "1.0.0-alpha.21"
+    },
+    {
+      "name": "@agenticprimitives/connect-client",
+      "version": "1.0.0-alpha.10"
+    },
+    {
+      "name": "@agenticprimitives/content-primitives",
+      "version": "1.0.0-alpha.22"
+    },
+    {
+      "name": "@agenticprimitives/content-storage",
+      "version": "0.1.0"
+    },
+    {
+      "name": "@agenticprimitives/contracts",
+      "version": "1.0.0-alpha.21"
+    },
+    {
+      "name": "@agenticprimitives/coordination",
+      "version": "0.0.0-alpha.4"
+    },
+    {
+      "name": "@agenticprimitives/delegated-signer",
+      "version": "0.0.0-alpha.13"
+    },
+    {
+      "name": "@agenticprimitives/delegation",
+      "version": "1.0.0-alpha.21"
+    },
+    {
+      "name": "@agenticprimitives/edge-cloudflare",
+      "version": "0.0.0-alpha.3"
+    },
+    {
+      "name": "@agenticprimitives/edge-runtime",
+      "version": "0.0.0-alpha.3"
+    },
+    {
+      "name": "@agenticprimitives/entitlements",
+      "version": "0.0.0-alpha.2"
+    },
+    {
+      "name": "@agenticprimitives/fabric",
+      "version": "0.0.0-alpha.10"
+    },
+    {
+      "name": "@agenticprimitives/fedcm-idp",
+      "version": "1.0.0-alpha.6"
+    },
+    {
+      "name": "@agenticprimitives/fedcm-rp",
+      "version": "1.0.0-alpha.6"
+    },
+    {
+      "name": "@agenticprimitives/fulfillment",
+      "version": "0.0.0-alpha.18"
+    },
+    {
+      "name": "@agenticprimitives/geo-features",
+      "version": "0.0.0-alpha.17"
+    },
+    {
+      "name": "@agenticprimitives/home",
+      "version": "0.0.0-alpha.10"
+    },
+    {
+      "name": "@agenticprimitives/identity-directory",
+      "version": "1.0.0-alpha.21"
+    },
+    {
+      "name": "@agenticprimitives/identity-directory-adapters",
+      "version": "1.0.0-alpha.21"
+    },
+    {
+      "name": "@agenticprimitives/intent-marketplace",
+      "version": "0.0.0-alpha.17"
+    },
+    {
+      "name": "@agenticprimitives/intent-resolver",
+      "version": "0.0.0-alpha.17"
+    },
+    {
+      "name": "@agenticprimitives/key-authorization",
+      "version": "0.0.0-alpha.5"
+    },
+    {
+      "name": "@agenticprimitives/key-custody",
+      "version": "1.0.0-alpha.21"
+    },
+    {
+      "name": "@agenticprimitives/mcp-oauth",
+      "version": "0.0.0-alpha.3"
+    },
+    {
+      "name": "@agenticprimitives/mcp-protocol",
+      "version": "0.0.0-alpha.1"
+    },
+    {
+      "name": "@agenticprimitives/mcp-runtime",
+      "version": "1.0.0-alpha.21"
+    },
+    {
+      "name": "@agenticprimitives/ontology",
+      "version": "1.0.0-alpha.21"
+    },
+    {
+      "name": "@agenticprimitives/orchestration",
+      "version": "0.0.0-alpha.1"
+    },
+    {
+      "name": "@agenticprimitives/orchestration-anthropic",
+      "version": "0.0.0-alpha.2"
+    },
+    {
+      "name": "@agenticprimitives/organization",
+      "version": "0.0.0-alpha.5"
+    },
+    {
+      "name": "@agenticprimitives/payments",
+      "version": "0.0.0-alpha.17"
+    },
+    {
+      "name": "@agenticprimitives/privacy-credentials",
+      "version": "0.0.0-alpha.2"
+    },
+    {
+      "name": "@agenticprimitives/provenance",
+      "version": "0.0.0-alpha.1"
+    },
+    {
+      "name": "@agenticprimitives/rate-control",
+      "version": "0.0.0-alpha.2"
+    },
+    {
+      "name": "@agenticprimitives/rate-control-cloudflare",
+      "version": "0.0.0-alpha.2"
+    },
+    {
+      "name": "@agenticprimitives/registry-kit",
+      "version": "0.0.0-alpha.9"
+    },
+    {
+      "name": "@agenticprimitives/related-agents",
+      "version": "0.0.0-alpha.17"
+    },
+    {
+      "name": "@agenticprimitives/service-agent",
+      "version": "0.0.0-alpha.8"
+    },
+    {
+      "name": "@agenticprimitives/situations",
+      "version": "0.0.0-alpha.5"
+    },
+    {
+      "name": "@agenticprimitives/surface-catalog",
+      "version": "0.0.0-alpha.2"
+    },
+    {
+      "name": "@agenticprimitives/tool-policy",
+      "version": "1.0.0-alpha.21"
+    },
+    {
+      "name": "@agenticprimitives/types",
+      "version": "1.0.0-alpha.21"
+    },
+    {
+      "name": "@agenticprimitives/vault",
+      "version": "0.0.0-alpha.2"
+    },
+    {
+      "name": "@agenticprimitives/verifiable-credentials",
+      "version": "0.0.0-alpha.18"
+    },
+    {
+      "name": "@agenticprimitives/verification-receipts",
+      "version": "0.0.0-alpha.2"
+    },
+    {
+      "name": "@agenticprimitives/witness",
+      "version": "0.0.0-alpha.5"
+    }
+  ]
+}

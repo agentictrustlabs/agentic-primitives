@@ -1,0 +1,70 @@
+[
+  {
+    "type": "function",
+    "name": "canAdminister",
+    "inputs": [
+      {
+        "name": "registryId",
+        "type": "bytes32",
+        "internalType": "bytes32"
+      },
+      {
+        "name": "entryId",
+        "type": "bytes32",
+        "internalType": "bytes32"
+      },
+      {
+        "name": "actor",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "ok",
+        "type": "bool",
+        "internalType": "bool"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "canRegister",
+    "inputs": [
+      {
+        "name": "registryId",
+        "type": "bytes32",
+        "internalType": "bytes32"
+      },
+      {
+        "name": "entryId",
+        "type": "bytes32",
+        "internalType": "bytes32"
+      },
+      {
+        "name": "subjectAgent",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "cardHash",
+        "type": "bytes32",
+        "internalType": "bytes32"
+      },
+      {
+        "name": "claimHashes",
+        "type": "bytes32[]",
+        "internalType": "bytes32[]"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "ok",
+        "type": "bool",
+        "internalType": "bool"
+      }
+    ],
+    "stateMutability": "view"
+  }
+]

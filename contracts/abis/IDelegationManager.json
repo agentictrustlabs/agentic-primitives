@@ -1,0 +1,382 @@
+[
+  {
+    "type": "function",
+    "name": "isRevoked",
+    "inputs": [
+      {
+        "name": "delegationHash",
+        "type": "bytes32",
+        "internalType": "bytes32"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "bool",
+        "internalType": "bool"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "redeemDelegation",
+    "inputs": [
+      {
+        "name": "delegations",
+        "type": "tuple[]",
+        "internalType": "struct IDelegationManager.Delegation[]",
+        "components": [
+          {
+            "name": "delegator",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "delegate",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "authority",
+            "type": "bytes32",
+            "internalType": "bytes32"
+          },
+          {
+            "name": "caveats",
+            "type": "tuple[]",
+            "internalType": "struct IDelegationManager.Caveat[]",
+            "components": [
+              {
+                "name": "enforcer",
+                "type": "address",
+                "internalType": "address"
+              },
+              {
+                "name": "terms",
+                "type": "bytes",
+                "internalType": "bytes"
+              },
+              {
+                "name": "args",
+                "type": "bytes",
+                "internalType": "bytes"
+              }
+            ]
+          },
+          {
+            "name": "salt",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "signature",
+            "type": "bytes",
+            "internalType": "bytes"
+          }
+        ]
+      },
+      {
+        "name": "target",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "value",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "data",
+        "type": "bytes",
+        "internalType": "bytes"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "revokeDelegation",
+    "inputs": [
+      {
+        "name": "delegationHash",
+        "type": "bytes32",
+        "internalType": "bytes32"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "revokeDelegationByOwner",
+    "inputs": [
+      {
+        "name": "delegation",
+        "type": "tuple",
+        "internalType": "struct IDelegationManager.Delegation",
+        "components": [
+          {
+            "name": "delegator",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "delegate",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "authority",
+            "type": "bytes32",
+            "internalType": "bytes32"
+          },
+          {
+            "name": "caveats",
+            "type": "tuple[]",
+            "internalType": "struct IDelegationManager.Caveat[]",
+            "components": [
+              {
+                "name": "enforcer",
+                "type": "address",
+                "internalType": "address"
+              },
+              {
+                "name": "terms",
+                "type": "bytes",
+                "internalType": "bytes"
+              },
+              {
+                "name": "args",
+                "type": "bytes",
+                "internalType": "bytes"
+              }
+            ]
+          },
+          {
+            "name": "salt",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "signature",
+            "type": "bytes",
+            "internalType": "bytes"
+          }
+        ]
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "verifyAuthorization",
+    "inputs": [
+      {
+        "name": "delegations",
+        "type": "tuple[]",
+        "internalType": "struct IDelegationManager.Delegation[]",
+        "components": [
+          {
+            "name": "delegator",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "delegate",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "authority",
+            "type": "bytes32",
+            "internalType": "bytes32"
+          },
+          {
+            "name": "caveats",
+            "type": "tuple[]",
+            "internalType": "struct IDelegationManager.Caveat[]",
+            "components": [
+              {
+                "name": "enforcer",
+                "type": "address",
+                "internalType": "address"
+              },
+              {
+                "name": "terms",
+                "type": "bytes",
+                "internalType": "bytes"
+              },
+              {
+                "name": "args",
+                "type": "bytes",
+                "internalType": "bytes"
+              }
+            ]
+          },
+          {
+            "name": "salt",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "signature",
+            "type": "bytes",
+            "internalType": "bytes"
+          }
+        ]
+      },
+      {
+        "name": "sender",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "ok",
+        "type": "bool",
+        "internalType": "bool"
+      },
+      {
+        "name": "reason",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "verifyAuthorizationForCall",
+    "inputs": [
+      {
+        "name": "delegations",
+        "type": "tuple[]",
+        "internalType": "struct IDelegationManager.Delegation[]",
+        "components": [
+          {
+            "name": "delegator",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "delegate",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "authority",
+            "type": "bytes32",
+            "internalType": "bytes32"
+          },
+          {
+            "name": "caveats",
+            "type": "tuple[]",
+            "internalType": "struct IDelegationManager.Caveat[]",
+            "components": [
+              {
+                "name": "enforcer",
+                "type": "address",
+                "internalType": "address"
+              },
+              {
+                "name": "terms",
+                "type": "bytes",
+                "internalType": "bytes"
+              },
+              {
+                "name": "args",
+                "type": "bytes",
+                "internalType": "bytes"
+              }
+            ]
+          },
+          {
+            "name": "salt",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "signature",
+            "type": "bytes",
+            "internalType": "bytes"
+          }
+        ]
+      },
+      {
+        "name": "sender",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "target",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "value",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "data",
+        "type": "bytes",
+        "internalType": "bytes"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "ok",
+        "type": "bool",
+        "internalType": "bool"
+      },
+      {
+        "name": "reason",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "event",
+    "name": "DelegationRedeemed",
+    "inputs": [
+      {
+        "name": "delegationHash",
+        "type": "bytes32",
+        "indexed": true,
+        "internalType": "bytes32"
+      },
+      {
+        "name": "delegator",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      },
+      {
+        "name": "delegate",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "DelegationRevoked",
+    "inputs": [
+      {
+        "name": "delegationHash",
+        "type": "bytes32",
+        "indexed": true,
+        "internalType": "bytes32"
+      }
+    ],
+    "anonymous": false
+  }
+]

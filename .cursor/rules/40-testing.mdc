@@ -1,0 +1,11 @@
+---
+description: Verification requirements for examples and integrations.
+globs: ["**/*.test.ts", "**/*.spec.ts", "**/examples/**", "**/templates/**"]
+alwaysApply: false
+---
+
+- Test packed/published package behavior, not only workspace source.
+- Include a negative test for each authority or validation rule.
+- Record exact release, chain, deployment, and ontology profile in fixtures.
+- Keep examples synthetic, bounded, and safe to rerun.
+- A generated starter is not complete until install, typecheck, tests, manifest validation, and smoke checks pass.

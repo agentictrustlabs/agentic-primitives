@@ -1,0 +1,98 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agenticprimitives.dev/schemas/contract-deployment.schema.json",
+  "title": "Agentic Primitives contract deployment record",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "logicalName",
+    "contractVersion",
+    "status",
+    "chain",
+    "address",
+    "source",
+    "compiler",
+    "artifacts",
+    "deployment"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "type": "string"
+    },
+    "logicalName": {
+      "type": "string"
+    },
+    "canonicalId": {
+      "type": "string"
+    },
+    "contractVersion": {
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "example",
+        "experimental",
+        "pilot",
+        "released",
+        "deprecated",
+        "quarantined"
+      ]
+    },
+    "exampleOnly": {
+      "type": "boolean"
+    },
+    "chain": {
+      "type": "object",
+      "required": [
+        "caip2",
+        "chainId"
+      ],
+      "properties": {
+        "caip2": {
+          "type": "string"
+        },
+        "chainId": {
+          "type": "integer"
+        }
+      }
+    },
+    "address": {
+      "type": "string",
+      "pattern": "^0x[0-9a-fA-F]{40}$"
+    },
+    "proxy": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "source": {
+      "type": "object"
+    },
+    "compiler": {
+      "type": "object"
+    },
+    "artifacts": {
+      "type": "object"
+    },
+    "deployment": {
+      "type": "object"
+    },
+    "eip712": {
+      "type": "object"
+    },
+    "verification": {
+      "type": "object"
+    },
+    "security": {
+      "type": "object"
+    },
+    "ontologyMappings": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "additionalProperties": true
+}

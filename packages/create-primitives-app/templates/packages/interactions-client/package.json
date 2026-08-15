@@ -1,0 +1,25 @@
+{
+  "name": "@starter/interactions-client",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Typed client for the live A2A interactions rail — discussion topics, 1:1 messaging, an org content library, and the person's inbox — all persisted in the owner's vault, never in your app.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "echo \"(no tests)\""
+  },
+  "dependencies": {
+    "@agenticprimitives/agent-account": "1.0.0-alpha.21",
+    "@agenticprimitives/connect-auth": "1.0.0-alpha.21",
+    "@agenticprimitives/fabric": "0.0.0-alpha.10",
+    "@agenticprimitives/key-custody": "1.0.0-alpha.21",
+    "@agenticprimitives/types": "1.0.0-alpha.21",
+    "viem": "^2.52.2"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3"
+  }
+}

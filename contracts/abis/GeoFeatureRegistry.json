@@ -1,0 +1,625 @@
+[
+  {
+    "type": "function",
+    "name": "COORD_SCALE",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "int256",
+        "internalType": "int256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "KIND_ADMIN",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "bytes32",
+        "internalType": "bytes32"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "KIND_COUNTRY",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "bytes32",
+        "internalType": "bytes32"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "KIND_CUSTOM",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "bytes32",
+        "internalType": "bytes32"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "KIND_PLANET",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "bytes32",
+        "internalType": "bytes32"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "KIND_REGION",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "bytes32",
+        "internalType": "bytes32"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "allFeatures",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "bytes32[]",
+        "internalType": "bytes32[]"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "deactivate",
+    "inputs": [
+      {
+        "name": "featureId",
+        "type": "bytes32",
+        "internalType": "bytes32"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "exists",
+    "inputs": [
+      {
+        "name": "featureId",
+        "type": "bytes32",
+        "internalType": "bytes32"
+      },
+      {
+        "name": "version",
+        "type": "uint64",
+        "internalType": "uint64"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "bool",
+        "internalType": "bool"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "getFeature",
+    "inputs": [
+      {
+        "name": "featureId",
+        "type": "bytes32",
+        "internalType": "bytes32"
+      },
+      {
+        "name": "version",
+        "type": "uint64",
+        "internalType": "uint64"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "tuple",
+        "internalType": "struct GeoFeatureRegistry.FeatureRecord",
+        "components": [
+          {
+            "name": "featureId",
+            "type": "bytes32",
+            "internalType": "bytes32"
+          },
+          {
+            "name": "version",
+            "type": "uint64",
+            "internalType": "uint64"
+          },
+          {
+            "name": "stewardAccount",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "featureKind",
+            "type": "bytes32",
+            "internalType": "bytes32"
+          },
+          {
+            "name": "geometryHash",
+            "type": "bytes32",
+            "internalType": "bytes32"
+          },
+          {
+            "name": "coverageRoot",
+            "type": "bytes32",
+            "internalType": "bytes32"
+          },
+          {
+            "name": "sourceSetRoot",
+            "type": "bytes32",
+            "internalType": "bytes32"
+          },
+          {
+            "name": "metadataURI",
+            "type": "string",
+            "internalType": "string"
+          },
+          {
+            "name": "centroidLat",
+            "type": "int256",
+            "internalType": "int256"
+          },
+          {
+            "name": "centroidLon",
+            "type": "int256",
+            "internalType": "int256"
+          },
+          {
+            "name": "bboxMinLat",
+            "type": "int256",
+            "internalType": "int256"
+          },
+          {
+            "name": "bboxMinLon",
+            "type": "int256",
+            "internalType": "int256"
+          },
+          {
+            "name": "bboxMaxLat",
+            "type": "int256",
+            "internalType": "int256"
+          },
+          {
+            "name": "bboxMaxLon",
+            "type": "int256",
+            "internalType": "int256"
+          },
+          {
+            "name": "validAfter",
+            "type": "uint64",
+            "internalType": "uint64"
+          },
+          {
+            "name": "validUntil",
+            "type": "uint64",
+            "internalType": "uint64"
+          },
+          {
+            "name": "active",
+            "type": "bool",
+            "internalType": "bool"
+          },
+          {
+            "name": "registeredAt",
+            "type": "uint64",
+            "internalType": "uint64"
+          }
+        ]
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "getLatest",
+    "inputs": [
+      {
+        "name": "featureId",
+        "type": "bytes32",
+        "internalType": "bytes32"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "tuple",
+        "internalType": "struct GeoFeatureRegistry.FeatureRecord",
+        "components": [
+          {
+            "name": "featureId",
+            "type": "bytes32",
+            "internalType": "bytes32"
+          },
+          {
+            "name": "version",
+            "type": "uint64",
+            "internalType": "uint64"
+          },
+          {
+            "name": "stewardAccount",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "featureKind",
+            "type": "bytes32",
+            "internalType": "bytes32"
+          },
+          {
+            "name": "geometryHash",
+            "type": "bytes32",
+            "internalType": "bytes32"
+          },
+          {
+            "name": "coverageRoot",
+            "type": "bytes32",
+            "internalType": "bytes32"
+          },
+          {
+            "name": "sourceSetRoot",
+            "type": "bytes32",
+            "internalType": "bytes32"
+          },
+          {
+            "name": "metadataURI",
+            "type": "string",
+            "internalType": "string"
+          },
+          {
+            "name": "centroidLat",
+            "type": "int256",
+            "internalType": "int256"
+          },
+          {
+            "name": "centroidLon",
+            "type": "int256",
+            "internalType": "int256"
+          },
+          {
+            "name": "bboxMinLat",
+            "type": "int256",
+            "internalType": "int256"
+          },
+          {
+            "name": "bboxMinLon",
+            "type": "int256",
+            "internalType": "int256"
+          },
+          {
+            "name": "bboxMaxLat",
+            "type": "int256",
+            "internalType": "int256"
+          },
+          {
+            "name": "bboxMaxLon",
+            "type": "int256",
+            "internalType": "int256"
+          },
+          {
+            "name": "validAfter",
+            "type": "uint64",
+            "internalType": "uint64"
+          },
+          {
+            "name": "validUntil",
+            "type": "uint64",
+            "internalType": "uint64"
+          },
+          {
+            "name": "active",
+            "type": "bool",
+            "internalType": "bool"
+          },
+          {
+            "name": "registeredAt",
+            "type": "uint64",
+            "internalType": "uint64"
+          }
+        ]
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "latestVersion",
+    "inputs": [
+      {
+        "name": "",
+        "type": "bytes32",
+        "internalType": "bytes32"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint64",
+        "internalType": "uint64"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "publish",
+    "inputs": [
+      {
+        "name": "p",
+        "type": "tuple",
+        "internalType": "struct GeoFeatureRegistry.PublishInput",
+        "components": [
+          {
+            "name": "featureId",
+            "type": "bytes32",
+            "internalType": "bytes32"
+          },
+          {
+            "name": "featureKind",
+            "type": "bytes32",
+            "internalType": "bytes32"
+          },
+          {
+            "name": "stewardAccount",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "geometryHash",
+            "type": "bytes32",
+            "internalType": "bytes32"
+          },
+          {
+            "name": "coverageRoot",
+            "type": "bytes32",
+            "internalType": "bytes32"
+          },
+          {
+            "name": "sourceSetRoot",
+            "type": "bytes32",
+            "internalType": "bytes32"
+          },
+          {
+            "name": "metadataURI",
+            "type": "string",
+            "internalType": "string"
+          },
+          {
+            "name": "centroidLat",
+            "type": "int256",
+            "internalType": "int256"
+          },
+          {
+            "name": "centroidLon",
+            "type": "int256",
+            "internalType": "int256"
+          },
+          {
+            "name": "bboxMinLat",
+            "type": "int256",
+            "internalType": "int256"
+          },
+          {
+            "name": "bboxMinLon",
+            "type": "int256",
+            "internalType": "int256"
+          },
+          {
+            "name": "bboxMaxLat",
+            "type": "int256",
+            "internalType": "int256"
+          },
+          {
+            "name": "bboxMaxLon",
+            "type": "int256",
+            "internalType": "int256"
+          },
+          {
+            "name": "validAfter",
+            "type": "uint64",
+            "internalType": "uint64"
+          },
+          {
+            "name": "validUntil",
+            "type": "uint64",
+            "internalType": "uint64"
+          }
+        ]
+      }
+    ],
+    "outputs": [
+      {
+        "name": "version",
+        "type": "uint64",
+        "internalType": "uint64"
+      }
+    ],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "setValidity",
+    "inputs": [
+      {
+        "name": "featureId",
+        "type": "bytes32",
+        "internalType": "bytes32"
+      },
+      {
+        "name": "version",
+        "type": "uint64",
+        "internalType": "uint64"
+      },
+      {
+        "name": "validAfter",
+        "type": "uint64",
+        "internalType": "uint64"
+      },
+      {
+        "name": "validUntil",
+        "type": "uint64",
+        "internalType": "uint64"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "event",
+    "name": "FeatureDeactivated",
+    "inputs": [
+      {
+        "name": "featureId",
+        "type": "bytes32",
+        "indexed": true,
+        "internalType": "bytes32"
+      },
+      {
+        "name": "version",
+        "type": "uint64",
+        "indexed": false,
+        "internalType": "uint64"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "FeaturePublished",
+    "inputs": [
+      {
+        "name": "featureId",
+        "type": "bytes32",
+        "indexed": true,
+        "internalType": "bytes32"
+      },
+      {
+        "name": "version",
+        "type": "uint64",
+        "indexed": true,
+        "internalType": "uint64"
+      },
+      {
+        "name": "steward",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      },
+      {
+        "name": "featureKind",
+        "type": "bytes32",
+        "indexed": false,
+        "internalType": "bytes32"
+      },
+      {
+        "name": "geometryHash",
+        "type": "bytes32",
+        "indexed": false,
+        "internalType": "bytes32"
+      },
+      {
+        "name": "coverageRoot",
+        "type": "bytes32",
+        "indexed": false,
+        "internalType": "bytes32"
+      },
+      {
+        "name": "sourceSetRoot",
+        "type": "bytes32",
+        "indexed": false,
+        "internalType": "bytes32"
+      },
+      {
+        "name": "metadataURI",
+        "type": "string",
+        "indexed": false,
+        "internalType": "string"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "FeatureValidityChanged",
+    "inputs": [
+      {
+        "name": "featureId",
+        "type": "bytes32",
+        "indexed": true,
+        "internalType": "bytes32"
+      },
+      {
+        "name": "version",
+        "type": "uint64",
+        "indexed": false,
+        "internalType": "uint64"
+      },
+      {
+        "name": "validAfter",
+        "type": "uint64",
+        "indexed": false,
+        "internalType": "uint64"
+      },
+      {
+        "name": "validUntil",
+        "type": "uint64",
+        "indexed": false,
+        "internalType": "uint64"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "error",
+    "name": "EmptyId",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "EmptyMetadata",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "FeatureNotFound",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "NotSteward",
+    "inputs": []
+  }
+]

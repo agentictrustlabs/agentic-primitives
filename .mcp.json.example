@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "agenticprimitives-dev": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["packages/dev-mcp/src/index.js"]
+    }
+  }
+}

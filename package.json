@@ -2,10 +2,13 @@
   "name": "agentic-primitives-starter",
   "version": "0.1.0",
   "private": true,
-  "description": "Public starter monorepo for building third-party apps on the Agentic Primitives substrate — npm packages, Ethereum contracts, and the live Home / A2A / MCP endpoints.",
+  "description": "Developer kit for the Agentic Primitives substrate — npm packages, Ethereum contracts, live Home / A2A / MCP rails, and create-primitives-app.",
   "license": "MIT",
   "type": "module",
   "packageManager": "pnpm@9.12.3",
+  "bin": {
+    "create-primitives-app": "./packages/create-primitives-app/bin/cli.js"
+  },
   "engines": {
     "node": ">=20"
   },
@@ -13,11 +16,21 @@
     "dev": "pnpm --filter @starter/commons dev",
     "build": "pnpm --filter @starter/commons build",
     "deploy": "pnpm --filter @starter/commons deploy",
+    "create-app": "node packages/create-primitives-app/bin/cli.js",
+    "sync-create-templates": "node packages/create-primitives-app/scripts/sync-templates.mjs",
     "typecheck": "pnpm -r typecheck",
     "test": "pnpm -r test",
     "check": "pnpm typecheck && pnpm test",
     "check:endpoints": "node scripts/check-endpoints.mjs",
-    "check:packages": "node scripts/check-packages.mjs"
+    "check:packages": "node scripts/check-packages.mjs",
+    "release:generate": "node scripts/generate-release.mjs",
+    "release:validate": "node scripts/validate-release.mjs",
+    "release": "node scripts/generate-release.mjs && node scripts/sync-skills.mjs && node scripts/validate-release.mjs",
+    "doctor": "node scripts/doctor.mjs",
+    "doctor:full": "node scripts/doctor.mjs --verify-code",
+    "skills:sync": "node scripts/sync-skills.mjs",
+    "skills:check": "node scripts/sync-skills.mjs --check",
+    "mcp": "node packages/dev-mcp/src/index.js"
   },
   "devDependencies": {
     "typescript": "^5.6.3"

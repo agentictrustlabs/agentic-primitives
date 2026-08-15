@@ -1,0 +1,40 @@
+{
+  "$schema": "../../../../schemas/contract-deployment.schema.json",
+  "schemaVersion": "1.0.0",
+  "logicalName": "paymentReceiptRegistry",
+  "canonicalId": "eip155:84532/paymentReceiptRegistry@base-sepolia-2026.08.0",
+  "contractVersion": "1.0.0-alpha.21",
+  "status": "pilot",
+  "chain": {
+    "caip2": "eip155:84532",
+    "chainId": 84532,
+    "name": "Base Sepolia"
+  },
+  "address": "0xF659091DDB30D3A608d6f96fAEDB41e966B72433",
+  "proxy": null,
+  "source": {
+    "package": "@agenticprimitives/contracts",
+    "packageVersion": "1.0.0-alpha.21",
+    "repository": "git+https://github.com/agentictrustlabs/agenticprimitives.git",
+    "recordedFrom": "deployments-base-sepolia.json"
+  },
+  "compiler": {
+    "toolchain": "foundry",
+    "details": "see @agenticprimitives/contracts build metadata"
+  },
+  "artifacts": {
+    "abi": "contracts/abis/PaymentReceiptRegistry.json",
+    "abiSha256": "d0ca6bd2ef1bba923dc2c641a7a5b7f88ccbc6fb13e938d196f51bc32963c635"
+  },
+  "deployment": {
+    "deployer": "0x31ed17fb99e82E02085Ab4B3cbdaB05489098b44",
+    "transactionHash": null,
+    "blockNumber": null,
+    "note": "tx/block provenance lives in the canonical deploy pipeline; this record is resolved from the published package"
+  },
+  "verification": {
+    "runtimeCodePresent": null,
+    "lastCheckedAt": null,
+    "method": "scripts/doctor.mjs --verify-code (eth_getCode against the public RPC)"
+  }
+}

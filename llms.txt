@@ -1,0 +1,55 @@
+# Agentic Primitives
+
+Developer kit for building apps on the Agentic Primitives substrate: 66 `@agenticprimitives/*`
+npm packages, Ethereum contracts on Base Sepolia, and three live services (Home, A2A, MCP).
+
+A token says WHO. A delegation says WHAT. Records live in the owner's vault, not the app.
+
+## Start
+
+- [Doc index](docs/README.md)
+- [Construct a project](docs/getting-started.md)
+- [create-primitives-app CLI](docs/create-app.md)
+- [Twelve principles](docs/principles.md)
+- [Architecture](docs/architecture.md)
+- [npm SDK](docs/sdk.md)
+- [Package catalog](docs/packages.md)
+- [Ethereum contracts](docs/contracts.md)
+- [Interactions API](docs/interactions-api.md)
+- [Register your app](docs/register-your-app.md)
+- [Live endpoints](docs/live-endpoints.md)
+- [Troubleshooting](docs/troubleshooting.md)
+- [Claude / Cursor](docs/vibe-coding.md)
+- [Assistant rules](AGENTS.md)
+
+## Release binding (generated — resolve, never copy)
+
+- [Release manifest](release-manifest.json) — pins, deployments, skills, endpoints
+- [Release binding guide](docs/release-binding.md)
+- [Package pins](catalog/packages.json) — 65 exact versions
+- [Contract index](catalog/contracts.json) — 34 deployments on eip155:84532
+- Deployment records: contracts/deployments/eip155-84532/base-sepolia-2026.08.0/
+- Released ABIs: contracts/abis/
+- Developer skills: skills/ (13, projected to .claude/.cursor/.agents)
+- [Developer MCP server](packages/dev-mcp/README.md) — read-only, 9 tools
+
+## Example app (not the product)
+
+- [Commons](apps/commons/README.md)
+- [Worker — every pattern](apps/commons/src/worker/index.ts)
+
+## Wrappers
+
+- [home-connect](packages/home-connect/README.md)
+- [interactions-client](packages/interactions-client/README.md)
+
+## Rules an assistant must not violate
+
+1. Never gate a capability on a token claim, scope, or audience.
+2. Never add a database for user content — vault via interactions-client.
+3. Never `try X ?? try Y` across mechanisms.
+4. Never retry or work around a ceremony refusal.
+5. Never put a credential in localStorage, a readable cookie, or a URL.
+6. Never hand-roll EIP-712 or a signature check — use `@agenticprimitives/delegation`.
+7. Never widen the Home issuer allowlist.
+8. The address is the identity; a name is a transferable facet.

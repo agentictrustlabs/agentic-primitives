@@ -1,0 +1,11 @@
+---
+description: Custody, authority, signing, admission, replay, and secret-handling rules.
+globs: ["**/*auth*", "**/*delegat*", "**/*custody*", "**/*sign*", "**/*policy*", "**/*a2a*", "**/*mcp*"]
+alwaysApply: false
+---
+
+- Separate custody operations from delegated operational authority.
+- Scope authority by subject, audience, methods/tools, value, time, nonce/JTI, and revocation.
+- Enforce policy at the trusted service/contract boundary.
+- Include replay, chain, audience, route, and signer-binding tests.
+- Never weaken admission or call private routes to make an example pass.
