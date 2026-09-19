@@ -10,10 +10,10 @@ Cursor loads the same content from `.cursor/rules/`; Claude reads `CLAUDE.md`, w
    In a project from `create-primitives-app`, read `apps/web/src/worker/index.ts` instead — that is
    the product. Commons stays in the public starter as the example.
 
-## The four instincts to override
+## The five instincts to override
 
 This substrate looks like a normal OAuth + REST app and is not one. The patterns a model reaches
-for by default are the exact ones it exists to replace. These four override them:
+for by default are the exact ones it exists to replace. These five override them:
 
 ### 1. A token is not authority
 
@@ -54,6 +54,28 @@ this origin. Render a link. Never retry, never work around, never fake success.
 `owner_only` means you reached an operation that belongs to the person alone. Working as designed —
 redesign the feature, do not route around the gate.
 
+### 5. Domain shape lives in the ontology, not in a prompt or a table
+
+If behaviour depends on a fact about how the domain is shaped — *a treasury is chartered under the
+agent that holds it*, *an inbox belongs to a person*, *a team has members* — that fact is a term in
+`@agenticprimitives/ontology`, bound by IRI. Never re-describe it in a prompt, a `SKILL.md`, a
+lookup table, or a string-similarity heuristic. The upstream bug this rule is made of: a resolver
+guessed `alice` → `alice.treasury`; Alice's treasury had another name; the relationship was in the
+ontology the whole time. Runtime playbooks (the [skills corpus](https://github.com/agentictrustlabs/skills))
+say how an agent behaves and grant nothing; they are not where the world's shape is written down.
+
+## Versions and addresses: resolve, never copy
+
+`release-manifest.json` binds the package pins, the contract deployment records, and the
+live endpoints for this release. When you need a version, read `catalog/packages.json`.
+When you need a contract address or ABI, read its record under `contracts/deployments/`
+— never a constant from prose, however plausible. `docs/release-binding.md` explains the
+whole surface.
+
+Focused skills live in `skills/` (projected into `.claude/skills/`, `.cursor/skills/`,
+`.agents/skills/`) — load the one matching your task instead of guessing procedure. The
+read-only Developer MCP server (`packages/dev-mcp`) serves the same facts as tools.
+
 ## Repo conventions
 
 - TypeScript strict, ESM, Node ≥ 20. `noUncheckedIndexedAccess` is on.
@@ -71,6 +93,7 @@ redesign the feature, do not route around the gate.
 pnpm typecheck
 pnpm check:endpoints    # the live rails are real and they change
 pnpm check:packages
+pnpm release:validate   # release surfaces agree with each other and pnpm.overrides
 ```
 
 If `check:endpoints` disagrees with `docs/live-endpoints.md`, **believe the endpoint** and fix the

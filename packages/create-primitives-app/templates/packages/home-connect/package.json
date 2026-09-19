@@ -12,12 +12,12 @@
     "test": "echo \"(no tests)\""
   },
   "dependencies": {
-    "@agenticprimitives/agent-account": "1.0.0-alpha.21",
-    "@agenticprimitives/connect-auth": "1.0.0-alpha.21",
-    "@agenticprimitives/connect-client": "1.0.0-alpha.10",
-    "@agenticprimitives/home": "0.0.0-alpha.10",
-    "@agenticprimitives/key-custody": "1.0.0-alpha.21",
-    "@agenticprimitives/types": "1.0.0-alpha.21",
+    "@agenticprimitives/agent-account": "1.0.0-alpha.26",
+    "@agenticprimitives/connect-auth": "1.0.0-alpha.26",
+    "@agenticprimitives/connect-client": "1.0.0-alpha.16",
+    "@agenticprimitives/home": "0.0.0-alpha.15",
+    "@agenticprimitives/key-custody": "1.0.0-alpha.26",
+    "@agenticprimitives/types": "1.0.0-alpha.26",
     "viem": "^2.52.2"
   },
   "devDependencies": {

@@ -63,14 +63,10 @@ hardcoded one would defeat the gate.
 
 Collapsed by default and never auto-opened: anyone who opens it can act as those accounts.
 
-Quick connect happens server-side, so the browser has no session at the **Home** — and every link
-this app offers there (organizations, storage, messaging, connected apps, invitations) would land
-on a credential challenge for an account whose key the person does not hold.
-
-`connectAsQuickConnect` returns a `homeSession` for exactly that, and the Home accepts it back as a
-`#session=` **fragment** (`src/context/session.tsx`). A fragment, deliberately: it never reaches a
-server, a referrer, or an access log — which a query parameter would, on every hop. This app keeps
-that token server-side alongside the id_token and appends it only when building a Home link.
+Quick connect happens server-side — it is not the browser SIWE ceremony a social user runs at
+Home — so the browser has no `ap_sso` cookie until we send it through the Home `#session=`
+handoff and back. `connectAsQuickConnect` returns that `homeSession` for exactly this. A
+fragment, deliberately: it never reaches a server, a referrer, or an access log.
 
 With it, every surface works as a test identity — including connecting a community, which is what
 unlocks discussion and the library.

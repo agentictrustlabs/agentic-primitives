@@ -95,7 +95,7 @@ server.registerTool(
       'Full deployment record for a logical contract name (e.g. "delegationManager"): address, chain, source package, ABI digest, verification method.',
     inputSchema: {
       name: z.string().describe('logical contract name, camelCase'),
-      chainId: z.number().optional().describe('numeric chain id; defaults to the only supported chain'),
+      chainId: z.number().optional().describe('numeric chain id; defaults to the reference testnet (the first supported chain)'),
     },
   },
   async ({ name, chainId }) => {
@@ -117,6 +117,7 @@ server.registerTool(
     inputSchema: { name: z.string().describe('logical contract name, camelCase') },
   },
   async ({ name }) => {
+    // ABIs are per contract, not per chain — the first matching record carries the same file.
     const entry = contractsCatalog.contracts.find((c) => c.logicalName === name);
     if (!entry) return refuse(`Unknown contract "${name}". Use contracts_list.`);
     if (!entry.abi) return refuse(`${name} has no ABI in this release (e.g. the canonical EntryPoint ships elsewhere).`);

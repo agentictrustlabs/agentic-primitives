@@ -37,7 +37,7 @@ the box, and CI in the source repo proves that on every commit.
 | `[directory]` | Where to write the project |
 | `--name <name>` | Display name |
 | `--client-id <id>` | Home `client_id` (3–40 chars, `[a-z0-9-]`) |
-| `--with-catalog` | Include the 66-package import harness |
+| `--with-catalog` | Include the 75-package import harness |
 | `--yes`, `-y` | Accept defaults, no prompts |
 | `--skip-install` | Skip `pnpm install` |
 | `--no-git` | Skip `git init` + initial commit |

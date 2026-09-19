@@ -32,7 +32,7 @@ Options:
   --name <name>          Display name (default: directory)
   --client-id <id>       Home client_id (3–40 chars, [a-z0-9-])
   --template <name>      app (default)
-  --with-catalog         Include the 66-package import harness
+  --with-catalog         Include the 75-package import harness
   --yes, -y              Accept defaults; no prompts
   --skip-install         Do not run pnpm install
   --no-git               Do not initialize a git repository
@@ -86,7 +86,7 @@ async function main() {
 
   const withCatalog =
     args.withCatalog ||
-    (!yes && (await prompt('Include the 66-package catalog harness? (y/N)', 'n')).toLowerCase() === 'y');
+    (!yes && (await prompt('Include the 75-package catalog harness? (y/N)', 'n')).toLowerCase() === 'y');
   const skipInstall = args.skipInstall || false;
   const withGit = args.git !== false;
 

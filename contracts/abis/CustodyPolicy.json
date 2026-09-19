@@ -1078,6 +1078,17 @@
   },
   {
     "type": "error",
+    "name": "StillInstalledOn",
+    "inputs": [
+      {
+        "name": "account",
+        "type": "address",
+        "internalType": "address"
+      }
+    ]
+  },
+  {
+    "type": "error",
     "name": "SystemPaused",
     "inputs": []
   },

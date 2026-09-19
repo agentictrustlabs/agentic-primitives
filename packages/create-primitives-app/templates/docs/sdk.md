@@ -1,11 +1,12 @@
 # npm SDK
 
-66 published libraries under [`@agenticprimitives`](https://www.npmjs.com/org/agenticprimitives).
+75 published libraries under [`@agenticprimitives`](https://www.npmjs.com/org/agenticprimitives).
 You will not use most of them. A relying app starts with six, plus the two workspace wrappers this
 kit ships.
 
-Pin exactly. Two alpha lines run concurrently (`1.0.0-alpha.21` and `0.0.0-alpha.N`). The root
-`package.json` `pnpm.overrides` is the known-good tree — copy it.
+Pin exactly. Two alpha lines run concurrently (`1.0.0-alpha.24` and `0.0.0-alpha.N`). The root
+`package.json` `pnpm.overrides` is the known-good tree — copy it, or resolve the whole set from
+[`catalog/packages.json`](../catalog/packages.json).
 
 ```sh
 pnpm add @agenticprimitives/types @agenticprimitives/connect-client \
@@ -25,6 +26,10 @@ Or scaffold and let the workspace wrappers pull them in: [create-app.md](./creat
 | `home` | `@agenticprimitives/home` | Home manifest schema, fail-closed validators |
 | `fabric` | `@agenticprimitives/fabric` | Envelopes, topic boards, inbox projections |
 | `contracts` | `@agenticprimitives/contracts/deployments-json/base-sepolia` | Addresses + ABIs as shipped data |
+
+When your app grows past a relying app — when it runs its own agent, plans, and acts under a
+mandate — the next three are `harness`, `orchestration`, and `tool-policy`. See
+[packages.md](./packages.md#acting-the-harness).
 
 This kit wraps the first two for a relying app:
 
@@ -50,8 +55,10 @@ const hash = hashDelegation(
 ```
 
 `@agenticprimitives/contracts` has **no default entry**. Subpaths only (`/deployments-json/base-sepolia`,
-`/abi`). That is deliberate. Do not re-type addresses into a config file — a redeploy then makes
-your UI lie. Full map: [contracts.md](./contracts.md).
+`/deployments/base-sepolia` typed, `/abi`). That is deliberate. Do not re-type addresses into a
+config file — a redeploy then makes your UI lie. The map is flat except for one nested object,
+`permissionlessSubregistries` (one typed-suffix subregistry per agent class). Full map:
+[contracts.md](./contracts.md).
 
 ## Authority — never hand-roll
 
@@ -95,10 +102,15 @@ Alpha. Pin the name **and** the transitive tree:
 ```json
 "pnpm": {
   "overrides": {
-    "@agenticprimitives/delegation": "1.0.0-alpha.21",
-    "@agenticprimitives/connect-client": "1.0.0-alpha.10"
+    "@agenticprimitives/delegation": "1.0.0-alpha.24",
+    "@agenticprimitives/connect-client": "1.0.0-alpha.14"
   }
 }
 ```
 
 Floating `^` across the two release lines is how you get a type error that names the wrong package.
+
+In a product repository built with `@agenticprimitives/create-app`, `npx ap upgrade --pin
+1.0.0-alpha.24` (or `--canary`) rewrites every pin to one coherent set and `npx ap doctor` reports
+an incoherent lock as a finding. That is the same discipline this kit's `pnpm release:validate`
+enforces on its own overrides.

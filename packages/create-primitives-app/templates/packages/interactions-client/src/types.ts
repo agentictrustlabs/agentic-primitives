@@ -49,7 +49,7 @@ export interface TopicMessage {
 
 export interface TopicListing {
   topics: Topic[];
-  /** How the caller is named in this community, or `Steward`. */
+  /** How the caller is known in this community. Empty until they set a local name or publish a listing. */
   you: string;
   /** Did the gate admit this caller as a steward of the principal? */
   steward: boolean;
@@ -60,6 +60,8 @@ export interface DirectoryMember {
   /** CAIP-10 canonical agent id of the member. */
   subject: string;
   displayName?: string;
+  /** How they asked to be known in this community — a facet, not a second identity. */
+  localName?: string;
   publishedAt?: string;
   [k: string]: unknown;
 }

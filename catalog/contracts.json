@@ -1,10 +1,11 @@
 {
   "schemaVersion": "1.0.0",
-  "release": "2026.08.0-pilot.1",
+  "release": "2026.09.0-pilot.1",
   "deploymentSets": {
-    "eip155:84532": "base-sepolia-2026.08.0"
+    "eip155:84532": "base-sepolia-2026.09.0",
+    "eip155:34348": "faithchain-2026.09.0"
   },
-  "count": 34,
+  "count": 87,
   "contracts": [
     {
       "logicalName": "agentAccountFactory",
@@ -33,7 +34,7 @@
     {
       "logicalName": "agentNameResolver",
       "address": "0xA15B0703716DC8634B74F97723618f74Af3AaA73",
-      "abi": null,
+      "abi": "contracts/abis/AgentNameAttributeResolver.json",
       "chain": "eip155:84532"
     },
     {
@@ -145,6 +146,60 @@
       "chain": "eip155:84532"
     },
     {
+      "logicalName": "permissionlessSubregistries.church",
+      "address": "0x97402E5A152670f356Eab9fD4270e1c8888ffc87",
+      "abi": "contracts/abis/PermissionlessSubregistry.json",
+      "chain": "eip155:84532"
+    },
+    {
+      "logicalName": "permissionlessSubregistries.circle",
+      "address": "0xE194187c64c45803eda55BC399A4e7d39C1449A6",
+      "abi": "contracts/abis/PermissionlessSubregistry.json",
+      "chain": "eip155:84532"
+    },
+    {
+      "logicalName": "permissionlessSubregistries.me",
+      "address": "0xDEABb2Ed8382775a01752f171bC4c625AcD15A71",
+      "abi": "contracts/abis/PermissionlessSubregistry.json",
+      "chain": "eip155:84532"
+    },
+    {
+      "logicalName": "permissionlessSubregistries.org",
+      "address": "0x13D2cabD890C93eF24937cc19dcDdc2a4d914418",
+      "abi": "contracts/abis/PermissionlessSubregistry.json",
+      "chain": "eip155:84532"
+    },
+    {
+      "logicalName": "permissionlessSubregistries.registry",
+      "address": "0x32d3a37f44614959049b9f19D610554e8D4aBD6C",
+      "abi": "contracts/abis/PermissionlessSubregistry.json",
+      "chain": "eip155:84532"
+    },
+    {
+      "logicalName": "permissionlessSubregistries.svc",
+      "address": "0xcf6d51c105E83621FcFA58D89a3846B8090352b4",
+      "abi": "contracts/abis/PermissionlessSubregistry.json",
+      "chain": "eip155:84532"
+    },
+    {
+      "logicalName": "permissionlessSubregistries.team",
+      "address": "0xC80e6B102721F6D0b158124E0095D3B12d941126",
+      "abi": "contracts/abis/PermissionlessSubregistry.json",
+      "chain": "eip155:84532"
+    },
+    {
+      "logicalName": "permissionlessSubregistries.treasury",
+      "address": "0xDFA05aa99B1C5dA606a438eaF7eD3b52a231E385",
+      "abi": "contracts/abis/PermissionlessSubregistry.json",
+      "chain": "eip155:84532"
+    },
+    {
+      "logicalName": "permissionlessSubregistries.workspace",
+      "address": "0x9f8b948a9a18C68dBF862cE61444112A93d9A491",
+      "abi": "contracts/abis/PermissionlessSubregistry.json",
+      "chain": "eip155:84532"
+    },
+    {
       "logicalName": "permissionlessSubregistry",
       "address": "0x598C7bbAf25f5246BE3D5A75FdEDC180D67D8026",
       "abi": "contracts/abis/PermissionlessSubregistry.json",
@@ -209,6 +264,270 @@
       "address": "0x3D2abD6c7C1319f2bbA96B3b76A7e0d92C620A39",
       "abi": "contracts/abis/ValueEnforcer.json",
       "chain": "eip155:84532"
+    },
+    {
+      "logicalName": "agentAccountFactory",
+      "address": "0x464eEe7518c3c97DA570592481329E0627E9a3B8",
+      "abi": "contracts/abis/AgentAccountFactory.json",
+      "chain": "eip155:34348"
+    },
+    {
+      "logicalName": "agentAccountImplementation",
+      "address": "0x8691bFE5Cd0bf532050e27d4fF0Cd1F82d1aE9a7",
+      "abi": "contracts/abis/AgentAccount.json",
+      "chain": "eip155:34348"
+    },
+    {
+      "logicalName": "agentNameRegistry",
+      "address": "0x60E949D52660A9D4143ecB0fdA56c0457f20aED9",
+      "abi": "contracts/abis/AgentNameRegistry.json",
+      "chain": "eip155:34348"
+    },
+    {
+      "logicalName": "agentNameResolver",
+      "address": "0xa5855906C0De3813E74BEe201973071e0c844115",
+      "abi": "contracts/abis/AgentNameAttributeResolver.json",
+      "chain": "eip155:34348"
+    },
+    {
+      "logicalName": "agentNameUniversalResolver",
+      "address": "0xF343054e046A4145ccae499ECB28197394eE0798",
+      "abi": "contracts/abis/AgentNameUniversalResolver.json",
+      "chain": "eip155:34348"
+    },
+    {
+      "logicalName": "agentProfileResolver",
+      "address": "0xB03F7C06ad3274F584AB72794406D639c02A45e1",
+      "abi": "contracts/abis/AgentProfileResolver.json",
+      "chain": "eip155:34348"
+    },
+    {
+      "logicalName": "agentRegistryBase",
+      "address": "0x0Be172F1b5cfD1d084CEc2cF2Af0A0cE9023Deb1",
+      "abi": "contracts/abis/AgentRegistryBase.json",
+      "chain": "eip155:34348"
+    },
+    {
+      "logicalName": "agentRelationship",
+      "address": "0x5015bD7d422e003511246f848cDd798cb00BB968",
+      "abi": "contracts/abis/AgentRelationship.json",
+      "chain": "eip155:34348"
+    },
+    {
+      "logicalName": "agreementRegistry",
+      "address": "0x5b580E741DBb4f57F6D885dF2c12F4e0B53B6f50",
+      "abi": "contracts/abis/AgreementRegistry.json",
+      "chain": "eip155:34348"
+    },
+    {
+      "logicalName": "allowedMethodsEnforcer",
+      "address": "0xdBb2E47793393C499efB0f3fcbf6Ca8669791a41",
+      "abi": "contracts/abis/AllowedMethodsEnforcer.json",
+      "chain": "eip155:34348"
+    },
+    {
+      "logicalName": "allowedTargetsEnforcer",
+      "address": "0x2156311097A936de1916a878bF53Bfd43c7b5715",
+      "abi": "contracts/abis/AllowedTargetsEnforcer.json",
+      "chain": "eip155:34348"
+    },
+    {
+      "logicalName": "approvedHashRegistry",
+      "address": "0xC6a4983bC6649f7C46c9E7d83f1Cd7e9078AFc7b",
+      "abi": "contracts/abis/ApprovedHashRegistry.json",
+      "chain": "eip155:34348"
+    },
+    {
+      "logicalName": "attestationRegistry",
+      "address": "0x4c94A0355380b8F5023eDd5f8A8131B020de19FA",
+      "abi": "contracts/abis/AttestationRegistry.json",
+      "chain": "eip155:34348"
+    },
+    {
+      "logicalName": "callDataHashEnforcer",
+      "address": "0x142e97F9012e587330Cfe6222E01338D1A200378",
+      "abi": "contracts/abis/CallDataHashEnforcer.json",
+      "chain": "eip155:34348"
+    },
+    {
+      "logicalName": "custodyPolicy",
+      "address": "0xfb3662Ddc308FAc977A1F663948A447055722d3B",
+      "abi": "contracts/abis/CustodyPolicy.json",
+      "chain": "eip155:34348"
+    },
+    {
+      "logicalName": "delegationManager",
+      "address": "0x710cb1bF08C234Df397e0910331e0A29710EF4F7",
+      "abi": "contracts/abis/DelegationManager.json",
+      "chain": "eip155:34348"
+    },
+    {
+      "logicalName": "digestBindingEnforcer",
+      "address": "0xA3bb9BCC9b2F6F2419E1aBe5ED6Fd5399b9E68e1",
+      "abi": "contracts/abis/DigestBindingEnforcer.json",
+      "chain": "eip155:34348"
+    },
+    {
+      "logicalName": "entryPoint",
+      "address": "0xf7855250B3363AB7649B10957d8908A9AFcdD4B5",
+      "abi": null,
+      "chain": "eip155:34348"
+    },
+    {
+      "logicalName": "geoFeatureRegistry",
+      "address": "0x4D0B90F17148ED671CfeEc1a6DAC4ee297f521B0",
+      "abi": "contracts/abis/GeoFeatureRegistry.json",
+      "chain": "eip155:34348"
+    },
+    {
+      "logicalName": "mockUsdc",
+      "address": "0xdaE09066A2cc32f6203605619137dcF01A9B49Ae",
+      "abi": "contracts/abis/MockUSDC.json",
+      "chain": "eip155:34348"
+    },
+    {
+      "logicalName": "ontologyTermRegistry",
+      "address": "0xA8Eaa2415EBF4250B041abD1561A3756CeEa0A6C",
+      "abi": "contracts/abis/OntologyTermRegistry.json",
+      "chain": "eip155:34348"
+    },
+    {
+      "logicalName": "paymentEnforcer",
+      "address": "0x07fA0aE59FdE4B7ce8962d6fE7a1d648ec3DD5CE",
+      "abi": "contracts/abis/PaymentEnforcer.json",
+      "chain": "eip155:34348"
+    },
+    {
+      "logicalName": "paymentReceiptRegistry",
+      "address": "0x5FfDd6186C1bBc4628187B1c4C1fDaA39F870d43",
+      "abi": "contracts/abis/PaymentReceiptRegistry.json",
+      "chain": "eip155:34348"
+    },
+    {
+      "logicalName": "permissionlessSubregistries.church",
+      "address": "0x65bBf8Fe17c62E711d903Dd5318F2F3Ef8f19866",
+      "abi": "contracts/abis/PermissionlessSubregistry.json",
+      "chain": "eip155:34348"
+    },
+    {
+      "logicalName": "permissionlessSubregistries.circle",
+      "address": "0x23ffbDADCC0255699d1CBF19244a98594777bDe5",
+      "abi": "contracts/abis/PermissionlessSubregistry.json",
+      "chain": "eip155:34348"
+    },
+    {
+      "logicalName": "permissionlessSubregistries.household",
+      "address": "0x9c3373E8F28739Df3aA478C18209fD7eeD769F5b",
+      "abi": "contracts/abis/PermissionlessSubregistry.json",
+      "chain": "eip155:34348"
+    },
+    {
+      "logicalName": "permissionlessSubregistries.me",
+      "address": "0x7fd5e2A3a49c321a4CEd39bE403eCde2Fc1CB823",
+      "abi": "contracts/abis/PermissionlessSubregistry.json",
+      "chain": "eip155:34348"
+    },
+    {
+      "logicalName": "permissionlessSubregistries.org",
+      "address": "0x5eA2Bd3986f1924764d145515C3680fAbaaBbE6a",
+      "abi": "contracts/abis/PermissionlessSubregistry.json",
+      "chain": "eip155:34348"
+    },
+    {
+      "logicalName": "permissionlessSubregistries.registry",
+      "address": "0x01a1008bF5b9690415BA9c2d108197B48339b393",
+      "abi": "contracts/abis/PermissionlessSubregistry.json",
+      "chain": "eip155:34348"
+    },
+    {
+      "logicalName": "permissionlessSubregistries.svc",
+      "address": "0xeBe1247403fB8e82f0cBb70D158AE38f627174A2",
+      "abi": "contracts/abis/PermissionlessSubregistry.json",
+      "chain": "eip155:34348"
+    },
+    {
+      "logicalName": "permissionlessSubregistries.team",
+      "address": "0x57Db73fA77C19601f5dCdeB79de40aAE9C505892",
+      "abi": "contracts/abis/PermissionlessSubregistry.json",
+      "chain": "eip155:34348"
+    },
+    {
+      "logicalName": "permissionlessSubregistries.treasury",
+      "address": "0xf1df2D9b779C62a8BF5707C799d8E6842382892B",
+      "abi": "contracts/abis/PermissionlessSubregistry.json",
+      "chain": "eip155:34348"
+    },
+    {
+      "logicalName": "permissionlessSubregistries.workspace",
+      "address": "0x823D33D20F7a8F0dBe315aC67633804eEd21d56A",
+      "abi": "contracts/abis/PermissionlessSubregistry.json",
+      "chain": "eip155:34348"
+    },
+    {
+      "logicalName": "permissionlessSubregistry",
+      "address": "0x9E803ac48b0F32BCE10BFC183b30f6d756DB11CC",
+      "abi": "contracts/abis/PermissionlessSubregistry.json",
+      "chain": "eip155:34348"
+    },
+    {
+      "logicalName": "permissionlessSubregistryDemoAgent",
+      "address": "0xEeB709C92C9287dBc3151d90c2ef18b07E9f303a",
+      "abi": null,
+      "chain": "eip155:34348"
+    },
+    {
+      "logicalName": "quorumEnforcer",
+      "address": "0x9bF556A36F3dF3972E355dE4215476Dc268bD0C7",
+      "abi": "contracts/abis/QuorumEnforcer.json",
+      "chain": "eip155:34348"
+    },
+    {
+      "logicalName": "receiptAnchorRegistry",
+      "address": "0x0e339334B4438F7546FD53837FDC8943cB3Cf54C",
+      "abi": "contracts/abis/ReceiptAnchorRegistry.json",
+      "chain": "eip155:34348"
+    },
+    {
+      "logicalName": "relationshipTypeRegistry",
+      "address": "0x0222388C3F9612058fb1bB2A9760c470DbD2121b",
+      "abi": "contracts/abis/RelationshipTypeRegistry.json",
+      "chain": "eip155:34348"
+    },
+    {
+      "logicalName": "shapeRegistry",
+      "address": "0xBd19d53981677357052EF9768B70929217a6F1F0",
+      "abi": "contracts/abis/ShapeRegistry.json",
+      "chain": "eip155:34348"
+    },
+    {
+      "logicalName": "skillDefinitionRegistry",
+      "address": "0xd692952978Aa3Bbc5F167060fAAd8eEFA48ADF93",
+      "abi": "contracts/abis/SkillDefinitionRegistry.json",
+      "chain": "eip155:34348"
+    },
+    {
+      "logicalName": "smartAgentPaymaster",
+      "address": "0xbd93fEC6910ffD74F14709188b5a9B6C6965b2a7",
+      "abi": "contracts/abis/SmartAgentPaymaster.json",
+      "chain": "eip155:34348"
+    },
+    {
+      "logicalName": "timestampEnforcer",
+      "address": "0x73A7B878168b7DE48677617179A8bE894f0Dfe96",
+      "abi": "contracts/abis/TimestampEnforcer.json",
+      "chain": "eip155:34348"
+    },
+    {
+      "logicalName": "universalSignatureValidator",
+      "address": "0xeDd56f500325D4701B9985A34e5Fa6EED6716137",
+      "abi": "contracts/abis/UniversalSignatureValidator.json",
+      "chain": "eip155:34348"
+    },
+    {
+      "logicalName": "valueEnforcer",
+      "address": "0x8759c1a6cEBF1D5069e9434EF46327Bf2ef69975",
+      "abi": "contracts/abis/ValueEnforcer.json",
+      "chain": "eip155:34348"
     }
   ]
 }

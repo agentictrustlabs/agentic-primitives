@@ -95,7 +95,7 @@ export function Library({ org }: { org: OrgSummary | null }) {
   return (
     <>
       {error?.code === 'not_authorized' ? (
-        <NotAuthorizedNotice orgName={org.name} steward={org.steward} />
+        <NotAuthorizedNotice orgName={org.name} steward={org.steward} member={org.member} />
       ) : (
         error && <ErrorLine error={error} onDismiss={() => setError(null)} />
       )}

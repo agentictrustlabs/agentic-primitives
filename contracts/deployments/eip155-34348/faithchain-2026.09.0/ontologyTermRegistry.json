@@ -1,0 +1,40 @@
+{
+  "$schema": "../../../../schemas/contract-deployment.schema.json",
+  "schemaVersion": "1.0.0",
+  "logicalName": "ontologyTermRegistry",
+  "canonicalId": "eip155:34348/ontologyTermRegistry@faithchain-2026.09.0",
+  "contractVersion": "1.0.0-alpha.26",
+  "status": "pilot",
+  "chain": {
+    "caip2": "eip155:34348",
+    "chainId": 34348,
+    "name": "Faithchain (estate chain)"
+  },
+  "address": "0xA8Eaa2415EBF4250B041abD1561A3756CeEa0A6C",
+  "proxy": null,
+  "source": {
+    "package": "@agenticprimitives/contracts",
+    "packageVersion": "1.0.0-alpha.26",
+    "repository": "git+https://github.com/agentictrustlabs/agenticprimitives.git",
+    "recordedFrom": "deployments-faithchain.json"
+  },
+  "compiler": {
+    "toolchain": "foundry",
+    "details": "see @agenticprimitives/contracts build metadata"
+  },
+  "artifacts": {
+    "abi": "contracts/abis/OntologyTermRegistry.json",
+    "abiSha256": "21f964f796c5dc16192d09441396b5c2f91847407198966493bf4d3fc7a8f3e2"
+  },
+  "deployment": {
+    "deployer": "0x1fcd93189311bedE20a02592cC83f31199A303bF",
+    "transactionHash": null,
+    "blockNumber": null,
+    "note": "tx/block provenance lives in the canonical deploy pipeline; this record is resolved from the published package"
+  },
+  "verification": {
+    "runtimeCodePresent": null,
+    "lastCheckedAt": null,
+    "method": "not verifiable from this kit — the chain has no public RPC"
+  }
+}

@@ -4,7 +4,7 @@
 // the ENTIRE published surface, and `pnpm check:packages` can then import each entry point for
 // real rather than asserting from a table that it would work.
 //
-// Why that is worth a package: the substrate ships ~66 libraries with a dense peer graph, and the
+// Why that is worth a package: the substrate ships ~75 libraries with a dense peer graph, and the
 // failure most third-party developers hit first is not "the API is wrong" — it is "this package
 // does not resolve in my runtime". A harness that installs all of them and imports each one turns
 // that into a check you run in ten seconds instead of a mystery you hit in week two.

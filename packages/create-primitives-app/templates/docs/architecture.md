@@ -86,6 +86,39 @@ Not a ledger the app writes to. It is where the **answers** live:
 Every gate reads it. That is what makes a revoke work everywhere at once, including in apps whose
 operators you have never met.
 
+The published contracts package also carries the **estate chain** (`34348`, gated RPC), where the
+mandate path — `DigestBindingEnforcer` + `PaymentEnforcer` — runs live. See
+[contracts.md](./contracts.md).
+
+### The harness — where an agent acts
+
+Behind the A2A boundary, a person's or organization's own agent runs the **harness**
+(`@agenticprimitives/harness` over `orchestration` and `tool-policy`): scope → classify → resolve
+→ plan → **verify per step** → approve → **re-verify** → execute → receipt. The planner is an LLM
+behind a port; it proposes steps and is never consulted about whether a step is allowed. A step
+that needs a mandate that does not exist yet pauses with an `input-required` naming exactly which
+signature is needed; the person signs it at their Home, and the run resumes by verifying again.
+Every protected step leaves a receipt in the owner's vault and a hash-chained audit sink.
+
+A relying app never runs the harness. It expresses an *intent* to the person's agent over A2A and
+renders what comes back — including a refusal that names the missing ceremony.
+
+### The ontology — the vocabulary every layer binds to
+
+None of the above works if "treasury", "member", "intent", or "capability" means a different thing
+at each hop. `@agenticprimitives/ontology` is the formal T-box (PROV-O and DOLCE+DnS underneath)
+that code binds to **by IRI**, the on-chain `OntologyTermRegistry` / `ShapeRegistry` instantiate,
+and a build gate enforces. It is what lets the harness follow `charteredUnder` to find whose
+treasury pays instead of guessing from a name; what lets a mandate hash a typed intent instead of a
+sentence; what lets a vault record be the same *kind of thing* in every Home; and what makes the
+receipt the same vocabulary read backwards. Prompts say how to behave. The ontology says how the
+world is shaped.
+
+Runtime behaviour — what an agent knows how to do — is authored as versioned, digest-addressed
+playbooks in the [skills corpus](https://github.com/agentictrustlabs/skills), compiled into the
+harness by digest, and cited on every receipt. A playbook grants nothing; see
+[skills/README.md](../skills/README.md).
+
 ## The two credentials, again
 
 Because it is the thing to get right:
@@ -138,8 +171,10 @@ Four verifications happened that your app did not perform and could not have ski
 | MCP | `https://demo-mcp-production.richardpedersen3.workers.dev` |
 | Chain | Base Sepolia, id `84532` |
 
-Contract addresses ship with `@agenticprimitives/contracts` — see [contracts.md](./contracts.md).
-Run `pnpm check:endpoints` to confirm they are answering as documented.
+Contract addresses ship with `@agenticprimitives/contracts` — see [contracts.md](./contracts.md);
+this kit's resolved records are under [`contracts/deployments/`](../contracts/deployments/).
+Run `pnpm check:endpoints` to confirm the rails are answering as documented, and
+`pnpm doctor:full` to confirm every Base Sepolia record still has runtime code.
 
 ## Status, honestly
 

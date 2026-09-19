@@ -14,11 +14,12 @@
 import { Hono } from 'hono';
 import { contentCommitment } from '@agenticprimitives/content-primitives';
 import deployments from '@agenticprimitives/contracts/deployments-json/base-sepolia';
-import { HomeConnectError } from '@starter/home-connect';
+import { HomeConnectError, isAllowedHomeOrigin } from '@starter/home-connect';
 import { InteractionsError, type CallerAuth } from '@starter/interactions-client';
 import type { LibraryEntry, Me, OrgSummary } from '../shared/api-types.js';
 import { buildConfig, ConfigError, homeCeremonyUrls, type AppConfig, type Env } from './config.js';
 import { delegationHashOf, findOrg, forgetOrgs, mergeCeremonyOrg, orgsFor } from './orgs.js';
+import { classifyRecipient, memberAddressByName } from './recipient.js';
 import {
   cookieHeaders,
   readCeremonyOrg,
@@ -33,13 +34,26 @@ import {
 type Vars = { cfg: AppConfig; session: SessionData | null };
 const app = new Hono<{ Bindings: Env; Variables: Vars }>();
 
-// The published package ships the addresses as a FLAT map (plus a `chainId`), so the addresses
-// this app shows and the addresses the gates read come from the same artifact — nothing is
-// re-typed into a config file here, where it could drift after a redeploy.
-const DEPLOYED = deployments as Record<string, string | number>;
+const ADDR = /^0x[0-9a-f]{40}$/;
+
+/** The address the gate named. A name is a facet; the wire is always to an address. */
+function recipientFrom(e: InteractionsError): string | undefined {
+  const raw = (e.body as { recipient?: unknown } | undefined)?.recipient;
+  const r = String(raw ?? '').toLowerCase();
+  return ADDR.test(r) ? r : undefined;
+}
+
+// The published package ships the addresses as one map (plus a `chainId`, and one nested map of
+// typed-suffix subregistries), so the addresses this app shows and the addresses the gates read
+// come from the same artifact — nothing is re-typed into a config file here, where it could drift
+// after a redeploy. Only the top-level contracts are shown; the per-suffix subregistries are a
+// naming concern this app never touches.
+const DEPLOYED = deployments as Record<string, unknown>;
 const CONTRACTS = Object.fromEntries(
-  Object.entries(DEPLOYED).filter(([, v]) => typeof v === 'string' && /^0x[0-9a-fA-F]{40}$/.test(v)),
-) as Record<string, string>;
+  Object.entries(DEPLOYED).filter(
+    (entry): entry is [string, string] => typeof entry[1] === 'string' && /^0x[0-9a-fA-F]{40}$/.test(entry[1]),
+  ),
+);
 const DELEGATION_MANAGER = CONTRACTS.delegationManager ?? '';
 
 // ── Failure translation ───────────────────────────────────────────────────────────────────────
@@ -49,15 +63,19 @@ const DELEGATION_MANAGER = CONTRACTS.delegationManager ?? '';
 function toResponse(
   e: unknown,
   cfg: AppConfig | null,
-  ctx: { org?: string; homeSession?: string } = {},
+  ctx: { org?: string; homeSession?: string; recipientName?: string } = {},
 ): Response {
   // `return` sends the person straight back here once the ceremony finishes, and `org` makes the
   // Home provision that organization's grants too — without it, a steward enables only their own.
+  const recipient = e instanceof InteractionsError ? recipientFrom(e) : undefined;
   const home = cfg
     ? homeCeremonyUrls(cfg.homeOrigin, {
         returnTo: cfg.redirectUri,
+        app: cfg.clientId,
         ...(ctx.org ? { org: ctx.org } : {}),
         ...(ctx.homeSession ? { homeSession: ctx.homeSession } : {}),
+        ...(recipient ? { recipient } : {}),
+        ...(ctx.recipientName ? { recipientName: ctx.recipientName } : {}),
       })
     : null;
   if (e instanceof ConfigError) {
@@ -70,7 +88,7 @@ function toResponse(
         : e.code === 'messaging_not_approved'
           ? (home?.approveMessaging ?? undefined)
           : e.code === 'read_grant'
-            ? (home?.connectedApps ?? undefined)
+            ? (home?.approveInboxRead ?? undefined)
             : undefined;
     const status =
       e.code === 'session_invalid' ? 401 : e.code === 'unreachable' || e.code === 'server_error' ? 502 : 409;
@@ -80,6 +98,20 @@ function toResponse(
     return Response.json({ error: e.message, code: e.code }, { status: 400 });
   }
   return Response.json({ error: e instanceof Error ? e.message : String(e) }, { status: 500 });
+}
+
+/** Front-channel `return` — this origin or a Home, never an open redirect. */
+function safeLogoutReturn(raw: string | undefined, requestUrl: string, cfg: AppConfig): string {
+  const fallback = cfg.redirectUri;
+  if (!raw) return fallback;
+  try {
+    const u = new URL(raw);
+    if (u.origin === new URL(requestUrl).origin) return u.toString();
+    if (isAllowedHomeOrigin(u.origin, { apex: cfg.homeOrigin })) return u.toString();
+    return fallback;
+  } catch {
+    return fallback;
+  }
 }
 
 // ── Middleware ────────────────────────────────────────────────────────────────────────────────
@@ -141,6 +173,7 @@ async function orgAuth(
     // the gate decides on membership instead. Sending a wire we do not have would be a lie the
     // gate would catch anyway.
     ...(org.stewardshipDelegation ? { stewardship: org.stewardshipDelegation } : {}),
+    ...(org.memberAccessDelegation ? { memberAccess: org.memberAccessDelegation } : {}),
   };
 }
 
@@ -410,7 +443,24 @@ app.post('/api/connect/demo', async (c) => {
     headers.append('set-cookie', jar.setSession(await seal(session, cfg.sessionSecret), ttl));
     // Whoever was here before, their org receipt is not this person's.
     headers.append('set-cookie', jar.clearOrg());
-    return c.json({ person: session.person, agentName: session.agentName }, { headers });
+    // Server-side mint never touches the Home origin, so the browser has no `ap_sso` cookie.
+    // Send them through the Home `#session=` handoff (then back here) so they are signed in
+    // at both — the same outcome as a social user who actually visited Home.
+    const homeHandoff = result.homeSession
+      ? (() => {
+          // `/` already has SessionProvider. `/handoff` 404s until that route is in the
+          // live Home build — a cached Vercel 404 is what the last bounce hit.
+          const u = new URL('/', cfg.homeOrigin);
+          const frag = new URLSearchParams();
+          frag.set('session', result.homeSession);
+          frag.set('return', cfg.redirectUri);
+          return `${u.origin}${u.pathname}#${frag.toString()}`;
+        })()
+      : null;
+    return c.json(
+      { person: session.person, agentName: session.agentName, ...(homeHandoff ? { homeHandoff } : {}) },
+      { headers },
+    );
   } catch (e) {
     return toResponse(e, cfg, handoffOf(c));
   }
@@ -422,6 +472,27 @@ app.post('/api/logout', (c) => {
   headers.append('set-cookie', jar.clearSession());
   headers.append('set-cookie', jar.clearOrg());
   return c.json({ ok: true }, { headers });
+});
+
+/**
+ * Front-channel logout from the Home. Top-level GET so this origin's SameSite=Lax
+ * session cookie is sent — a hidden iframe from impact-agent.me would not see it.
+ * `return` must be this app or a Home origin; anything else lands on our own door.
+ */
+app.get('/sso-logout', (c) => {
+  let cfg: AppConfig;
+  try {
+    cfg = buildConfig(c.env);
+  } catch (e) {
+    return toResponse(e, null);
+  }
+  const jar = cookieHeaders(c.req.url);
+  const headers = new Headers();
+  headers.append('set-cookie', jar.clearSession());
+  headers.append('set-cookie', jar.clearOrg());
+  headers.set('cache-control', 'no-store');
+  headers.set('location', safeLogoutReturn(c.req.query('return'), c.req.url, cfg));
+  return new Response(null, { status: 302, headers });
 });
 
 // ── Organizations ─────────────────────────────────────────────────────────────────────────────
@@ -444,6 +515,7 @@ app.get('/api/orgs', async (c) => {
           address: String(o.orgAgent).toLowerCase(),
           name: o.orgName || 'Organization',
           steward: !!o.stewardshipDelegation,
+          member: !!o.memberAccessDelegation || o.relationship === 'member',
           ...(hash ? { delegationHash: hash } : {}),
           storage: { granted: status.granted, current: status.current },
         };
@@ -539,6 +611,30 @@ app.post('/api/topics/:id/posts', async (c) => {
 });
 
 /**
+ * How this person is known in the selected organization.
+ *
+ * An org-local facet written to the org's vault. Not a public handle and not a new identity —
+ * the address stays the key. Members without a signed directory listing need one before they
+ * can open or post to a topic.
+ */
+app.post('/api/local-name', async (c) => {
+  const cfg = c.get('cfg');
+  let orgForCeremony = '';
+  try {
+    const session = required(c.get('session'));
+    const body = (await c.req.json().catch(() => ({}))) as { org?: string; displayName?: string };
+    const org = body.org ?? '';
+    orgForCeremony = org;
+    const displayName = String(body.displayName ?? '').trim();
+    if (!displayName) return c.json({ error: 'a name is required', code: 'local_name_required' }, 400);
+    const r = await cfg.interactions.setLocalName(org, displayName, await orgAuth(cfg, c, session, org));
+    return c.json(r);
+  } catch (e) {
+    return toResponse(e, cfg, { org: orgForCeremony, ...handoffOf(c) });
+  }
+});
+
+/**
  * Where an invitation to the selected organization gets issued.
  *
  * NOT an attempt that fails — a selection made up front, which is the only honest shape here.
@@ -570,12 +666,19 @@ app.get('/api/invite', async (c) => {
       return c.json({ error: 'this organization is not connected to this app', code: 'not_authorized' }, 403);
     }
 
+    // `return` + `app` travel on the ceremony URL so the Home writes them onto the invite
+    // record. After the invitee accepts, Home sends them here — without these, they stay
+    // on the Home's own org page even though the join succeeded.
+    const back = new URL(cfg.redirectUri);
+    back.searchParams.set('org', org);
     return c.json({
       // Stewardship is what the Home will require. Reported so the UI can say so before sending
       // somebody to a page that will refuse them.
       canInvite: !!known.stewardshipDelegation,
       orgName: known.orgName,
       ceremonyUrl: homeCeremonyUrls(cfg.homeOrigin, {
+        returnTo: back.toString(),
+        app: cfg.clientId,
         ...(session.homeSession ? { homeSession: session.homeSession } : {}),
       }).inviteToOrg(org),
     });
@@ -603,9 +706,27 @@ app.get('/api/messaging', async (c) => {
   try {
     const session = required(c.get('session'));
     const status = await cfg.interactions.messagingStatus(session.person, { session: session.idToken });
+    // A target is a CLASS, not a person: the naming registry means "any named agent", an org SA
+    // means "current members of this community". Counting them as "approved contacts" is a lie
+    // that tells the person they must sign once per counterparty.
+    const registry = (CONTRACTS.agentNameRegistry ?? '').toLowerCase();
+    const orgs = await resolveOrgs(cfg, c, session);
+    const orgName = new Map(
+      orgs.map((o) => [String(o.orgAgent).toLowerCase(), o.orgName || 'Organization'] as const),
+    );
+    const recipients = status.recipients.map((r) => r.toLowerCase());
+    const namedToNamed = !!registry && recipients.includes(registry);
+    const communities = [...orgName.entries()]
+      .filter(([addr]) => recipients.includes(addr))
+      .map(([address, name]) => ({ address, name }));
+    const classSet = new Set<string>([...(registry ? [registry] : []), ...communities.map((c) => c.address)]);
+    const contacts = recipients.filter((r) => !classSet.has(r));
     return c.json({
       wirePresent: status.wirePresent,
       recipients: status.recipients,
+      namedToNamed,
+      communities,
+      contacts,
       approveUrl: homeCeremonyUrls(cfg.homeOrigin, {
         ...(session.homeSession ? { homeSession: session.homeSession } : {}),
       }).approveMessaging,
@@ -617,27 +738,46 @@ app.get('/api/messaging', async (c) => {
 
 app.post('/api/messaging/send', async (c) => {
   const cfg = c.get('cfg');
+  const body = (await c.req.json().catch(() => ({}))) as {
+    address?: string;
+    agentName?: string;
+    conversationId?: string;
+    org?: string;
+    text?: string;
+    subject?: string;
+  };
   try {
     const session = required(c.get('session'));
-    const body = (await c.req.json().catch(() => ({}))) as {
-      address?: string;
-      agentName?: string;
-      conversationId?: string;
-      text?: string;
-      subject?: string;
-    };
     const text = String(body.text ?? '').trim();
     if (!text) return c.json({ error: 'text is required' }, 400);
 
-    // ONE way to name the recipient, chosen by the caller. Trying an address, then a name, then a
-    // conversation would eventually send the message to whoever happened to resolve (ADR-0013).
-    const to = body.address
+    // A name is a facet. The send is always to a canonical address. The caller picks which
+    // map to read (address as-is, public agent name, or how they are known in this community)
+    // — not a chain of attempts (ADR-0013).
+    let to: { address: string } | { agentName: string } | { conversationId: string } | null = body.address
       ? { address: body.address }
-      : body.agentName
-        ? { agentName: body.agentName }
-        : body.conversationId
-          ? { conversationId: body.conversationId }
-          : null;
+      : body.conversationId
+        ? { conversationId: body.conversationId }
+        : null;
+    if (!to && body.agentName) {
+      const picked = classifyRecipient(body.agentName, body.org);
+      if (picked.kind === 'address') to = { address: picked.address };
+      else if (picked.kind === 'agent-name') to = { agentName: picked.agentName };
+      else {
+        const members = await cfg.interactions.listMembers(picked.org, await orgAuth(cfg, c, session, picked.org));
+        const addr = memberAddressByName(members, picked.name);
+        if (!addr) {
+          return c.json(
+            {
+              error: `no member of this community is known as "${picked.name}". To message by public agent name, use name.impact.`,
+              code: 'not_found',
+            },
+            404,
+          );
+        }
+        to = { address: addr };
+      }
+    }
     if (!to) return c.json({ error: 'name the recipient by address, agentName, or conversationId' }, 400);
 
     const r = await cfg.interactions.sendMessage(
@@ -647,7 +787,10 @@ app.post('/api/messaging/send', async (c) => {
     );
     return c.json(r);
   } catch (e) {
-    return toResponse(e, cfg, handoffOf(c));
+    return toResponse(e, cfg, {
+      ...handoffOf(c),
+      ...(body.agentName ? { recipientName: body.agentName } : {}),
+    });
   }
 });
 
@@ -674,7 +817,8 @@ app.get('/api/inbox', async (c) => {
     // say so. The refusal travels back as a ceremony rather than an empty inbox: an empty list
     // would be a lie about what is there, and a 500 would be a lie about whose problem it is.
     const code = typeof body.code === 'string' ? body.code : '';
-    if (code.startsWith('read_grant')) {
+    const err = typeof body.error === 'string' ? body.error : '';
+    if (code.startsWith('read_grant') || /read grant/i.test(err)) {
       return Response.json(
         {
           error:
@@ -682,13 +826,41 @@ app.get('/api/inbox', async (c) => {
             'and can withdraw it for this app alone.',
           code: 'read_grant',
           ceremonyUrl: homeCeremonyUrls(cfg.homeOrigin, {
+            returnTo: cfg.redirectUri,
+            app: cfg.clientId,
             ...(session.homeSession ? { homeSession: session.homeSession } : {}),
-          }).connectedApps,
+          }).approveInboxRead,
         },
         { status: 409 },
       );
     }
-    return Response.json(body, { status: r.status });
+    if (!r.ok) return Response.json(body, { status: r.status });
+
+    // Home's projection is items + envelopeMeta + bodies. Flatten here so the SPA has one shape
+    // and does not re-join three maps it does not own.
+    const items = Array.isArray(body.items) ? (body.items as Record<string, unknown>[]) : [];
+    const meta = (body.envelopeMeta && typeof body.envelopeMeta === 'object' ? body.envelopeMeta : {}) as Record<
+      string,
+      { from?: string; subject?: string; createdAt?: string }
+    >;
+    const bodies = (body.bodies && typeof body.bodies === 'object' ? body.bodies : {}) as Record<string, string>;
+    const names = (body.names && typeof body.names === 'object' ? body.names : {}) as Record<string, string>;
+    const envelopes = items.map((it) => {
+      const id = String(it.messageId ?? it.id ?? '');
+      const m = meta[id] ?? {};
+      const from = String(m.from ?? '');
+      const addr = (from.match(/0x[0-9a-fA-F]{40}/)?.[0] ?? '').toLowerCase();
+      return {
+        id,
+        conversationId: String(it.conversationId ?? ''),
+        subject: m.subject ?? '',
+        from: (addr && names[addr]) || from,
+        createdAt: String(m.createdAt ?? it.lastEventAt ?? ''),
+        preview: typeof it.bodyPreview === 'string' ? it.bodyPreview : undefined,
+        bodyText: bodies[id],
+      };
+    });
+    return Response.json({ envelopes });
   } catch (e) {
     return toResponse(e, cfg, handoffOf(c));
   }

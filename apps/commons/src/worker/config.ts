@@ -100,15 +100,14 @@ export function buildConfig(env: Env): AppConfig {
  * origin) and `?org=` to include a specific organization. It is the answer to
  * `no interactions grant`.
  *
- * `approveMessaging` → `/messages`. The outbound messaging WIRE is a different artifact, and its
- * ceremony is per-counterparty: the person approves a named recipient, once. The reference Home
- * offers that prompt INLINE beside a refused send in its own messaging UI — there is no standalone
- * route to link at, so the honest instruction is "message them once from your Home, approve there".
- * The wire then lives with the person's agent, so sending from here works afterwards.
+ * `approveMessaging` → `/approve-messaging?to=<address>`. The outbound messaging WIRE is a
+ * different artifact, and its ceremony is per-counterparty: the person approves a named
+ * recipient, once, with a credential that does not exist on this origin. Home runs that
+ * signature and returns here — not the inbox.
  */
 export const homeCeremonyUrls = (
   homeOrigin: string,
-  ctx: { returnTo?: string; org?: string; homeSession?: string } = {},
+  ctx: { returnTo?: string; org?: string; app?: string; homeSession?: string; recipient?: string; recipientName?: string } = {},
 ) => {
   /**
    * The `#session=` handoff the Home accepts (`src/context/session.tsx`).
@@ -123,13 +122,27 @@ export const homeCeremonyUrls = (
     const u = new URL(path, homeOrigin);
     if (ctx.returnTo) u.searchParams.set('return', ctx.returnTo);
     if (ctx.org) u.searchParams.set('org', ctx.org);
+    if (ctx.app) u.searchParams.set('app', ctx.app);
     return u.toString() + handoff;
   };
   return {
     enableStorage: withCtx('/enable-messaging'),
-    approveMessaging: `${homeOrigin}/messages${handoff}`,
+    approveMessaging: (() => {
+      const u = new URL('/approve-messaging', homeOrigin);
+      if (ctx.recipient) u.searchParams.set('to', ctx.recipient);
+      if (ctx.recipientName) u.searchParams.set('n', ctx.recipientName);
+      if (ctx.returnTo) u.searchParams.set('return', ctx.returnTo);
+      return u.toString() + handoff;
+    })(),
     organizations: `${homeOrigin}/organizations${handoff}`,
     connectedApps: `${homeOrigin}/apps${handoff}`,
+    /** Let this app read the person's inbox — a scoped, read-only grant, not the connect itself. */
+    approveInboxRead: (() => {
+      const u = new URL('/approve-inbox-read', homeOrigin);
+      u.searchParams.set('app', ctx.app ?? 'commons-app');
+      if (ctx.returnTo) u.searchParams.set('return', ctx.returnTo);
+      return u.toString() + handoff;
+    })(),
     /**
      * Where an invitation is actually issued.
      *
@@ -138,7 +151,10 @@ export const homeCeremonyUrls = (
      * through the steward's credential — a Home session. A relying app authenticates AS the person
      * and holds no custody, so it cannot mint one and should not pretend to.
      */
-    inviteToOrg: (org: string): string =>
-      `${homeOrigin}/org/${org.toLowerCase()}/invite${handoff}`,
+    // Members is the live invite surface. `/invite` 308'd there and dropped `return`/`app`,
+    // so the invitee joined the org and stayed on Home. This path keeps those params.
+    inviteToOrg: (org: string): string => withCtx(`/org/${org.toLowerCase()}/members`),
+    /** End the Home session (and, from there, this app's cookie) then return here. */
+    logout: withCtx('/logout'),
   };
 };

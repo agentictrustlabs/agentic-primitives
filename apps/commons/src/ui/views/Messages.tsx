@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import type { MessagingState } from '../../shared/api-types.js';
 import { api, CommonsError } from '../api.js';
-import { CeremonyNotice, Empty, ErrorLine } from './parts.js';
+import { Empty, ErrorLine } from './parts.js';
 
 interface InboxEnvelope {
   id?: string;
@@ -11,6 +11,13 @@ interface InboxEnvelope {
   createdAt?: string;
   preview?: string;
   bodyText?: string;
+}
+
+interface MemberOption {
+  /** What gets typed into the recipient box — a public agent name, or an org-local name. */
+  value: string;
+  /** The other facet, shown as the option hint. */
+  hint: string;
 }
 
 /**
@@ -24,8 +31,37 @@ interface InboxEnvelope {
  * The consequence a developer has to design for: a person who has not approved messaging cannot
  * send, and this app cannot approve it for them. Their custody credential lives at their Home.
  * The refusal names the counterparty so the approval is one click, not a scavenger hunt.
+ *
+ * The wire itself is not a contact list. A named person's standing approval covers any named
+ * agent; an org-scope entry covers current members. Exact addresses are leftovers from before
+ * those classes existed, or a one-off for someone outside them.
  */
-export function Messages() {
+
+function joinEnglish(parts: string[]): string {
+  if (parts.length === 0) return '';
+  if (parts.length === 1) return parts[0] ?? '';
+  if (parts.length === 2) return `${parts[0]} and ${parts[1]}`;
+  return `${parts.slice(0, -1).join(', ')}, and ${parts[parts.length - 1]}`;
+}
+
+/** What the wire actually covers — classes first, never a headcount of addresses. */
+function wireCoverage(state: MessagingState): string | null {
+  const communities = state.communities ?? [];
+  const contacts = state.contacts ?? [];
+  const scopes: string[] = [];
+  if (state.namedToNamed) scopes.push('any agent with a public name');
+  if (communities.length > 0) {
+    scopes.push(`current members of ${joinEnglish(communities.map((c) => c.name))}`);
+  }
+  if (contacts.length === 1) scopes.push('one specific contact');
+  if (contacts.length > 1) scopes.push(`${contacts.length} specific contacts`);
+  if (scopes.length === 0) return null;
+  if (state.namedToNamed || communities.length > 0) {
+    return `Your agent may message ${joinEnglish(scopes)}. That is one standing approval — not one per person.`;
+  }
+  return `Your wire still names ${contacts.length} specific ${contacts.length === 1 ? 'person' : 'people'}. The next approval at your Home upgrades it to named agents and your communities — not one person at a time.`;
+}
+export function Messages({ org }: { org: { address: string; name: string } | null }) {
   const [state, setState] = useState<MessagingState | null>(null);
   const [inbox, setInbox] = useState<InboxEnvelope[]>([]);
   const [to, setTo] = useState('');
@@ -36,6 +72,7 @@ export function Messages() {
   const [inboxRefusal, setInboxRefusal] = useState<CommonsError | null>(null);
   const [sent, setSent] = useState<string>('');
   const [busy, setBusy] = useState(false);
+  const [memberOptions, setMemberOptions] = useState<MemberOption[]>([]);
 
   const load = useCallback(async () => {
     try {
@@ -59,6 +96,33 @@ export function Messages() {
     void load();
   }, [load]);
 
+  // The community's roster as recipient suggestions. Each member is offered by the name that will
+  // resolve: their public agent name when they hold one, else the name this org knows them by
+  // (which the worker maps through the same directory). A refusal (not a member here) just means
+  // no suggestions — typing an address or a public name still works.
+  useEffect(() => {
+    setMemberOptions([]);
+    if (!org?.address) return;
+    let cancelled = false;
+    void api
+      .get<{ members: { subject?: string; displayName?: string; localName?: string; publicName?: string }[] }>(
+        `/api/members?org=${org.address}`,
+      )
+      .then((r) => {
+        if (cancelled) return;
+        setMemberOptions(
+          r.members.flatMap((m) => {
+            const local = m.localName || m.displayName || '';
+            const value = m.publicName || local;
+            if (!value) return [];
+            return [{ value, hint: m.publicName && local ? `${local} in ${org.name}` : m.publicName ? '' : `in ${org.name}` }];
+          }),
+        );
+      })
+      .catch(() => { /* not admitted here — the picker stays empty, the input still takes anything */ });
+    return () => { cancelled = true; };
+  }, [org?.address, org?.name]);
+
   const send = async () => {
     const target = to.trim();
     if (!target || !text.trim()) return;
@@ -66,13 +130,13 @@ export function Messages() {
     setError(null);
     setSent('');
     try {
-      // The caller picks HOW the recipient is named: a `0x…` is an address, anything else is an
-      // agent name the substrate resolves on-chain. One selection, never a chain of attempts.
+      // A name is a facet. The worker maps it to a canonical address, then sends there.
       const to_ = /^0x[0-9a-fA-F]{40}$/.test(target) ? { address: target } : { agentName: target };
       const r = await api.post<{ messageId: string }>('/api/messaging/send', {
         ...to_,
         text: text.trim(),
         ...(subject.trim() ? { subject: subject.trim() } : {}),
+        ...(org?.address ? { org: org.address } : {}),
       });
       setSent(r.messageId);
       setText('');
@@ -84,35 +148,20 @@ export function Messages() {
     }
   };
 
+  const coverage = state ? wireCoverage(state) : null;
+
   return (
     <>
-      {/* NOT a blocking notice, and no longer shown before anything is attempted.
-          The wire is approved PER COUNTERPARTY, so "not approved yet" up front cannot be acted on
-          — there is no recipient to approve. It becomes actionable only after a send is refused,
-          where the refusal names them. Leading with an alarm and a link that cannot fix it is the
-          dead end this replaces. */}
-      {state && !state.wirePresent && (
-        <p className="muted" style={{ marginBottom: 12, fontSize: 13 }}>
-          Your agent has no messaging approvals yet. You approve one contact at a time, with your own
-          credential — send below and it will tell you exactly who to approve.
-        </p>
-      )}
-      {/* A refused send names the counterparty, which is the whole reason this is one click and
-          not a scavenger hunt. The reference Home offers the approval INLINE beside a send in its
-          own Messages view — there is no standalone route to link at — so the instruction says
-          where to go rather than pretending a button here could sign it. */}
       {error?.code === 'messaging_not_approved' ? (
         <div className="notice" style={{ marginBottom: 14 }}>
-          <strong>Approve {to.trim() || 'this contact'} first</strong>
+          <strong>Approve {to.trim() || 'this contact'} once</strong>
           <p style={{ margin: '4px 0 8px' }}>
-            Letting your agent message someone is a standing authority you sign once, per contact, with
-            your own credential — which lives at your Home and never here. Open your Home&apos;s Messages,
-            send to <code>{to.trim() || 'them'}</code> once and approve when it asks. Sending from here
-            works afterwards; the approval lives with your agent, not with this app.
+            Your Home will sign, then bring you back here. Send again after that — Commons never
+            holds the credential.
           </p>
           {error.ceremonyUrl && (
-            <a href={error.ceremonyUrl} target="_blank" rel="noreferrer">
-              Open Messages at your Home →
+            <a href={error.ceremonyUrl}>
+              Approve — then return here →
             </a>
           )}
         </div>
@@ -125,10 +174,24 @@ export function Messages() {
         <div className="stack" style={{ marginTop: 10 }}>
           <input
             type="text"
-            placeholder="recipient — an agent name (nathan.impact) or a 0x address"
+            placeholder={
+              org
+                ? `a name in ${org.name}, a public agent name (nathan.impact), or a 0x address`
+                : 'a public agent name (nathan.impact) or a 0x address'
+            }
             value={to}
             onChange={(e) => setTo(e.target.value)}
+            list="commons-recipient-options"
           />
+          {memberOptions.length > 0 && (
+            <datalist id="commons-recipient-options">
+              {memberOptions.map((o) => (
+                <option key={o.value} value={o.value}>
+                  {o.hint}
+                </option>
+              ))}
+            </datalist>
+          )}
           <input type="text" placeholder="subject (optional)" value={subject} onChange={(e) => setSubject(e.target.value)} />
           <textarea placeholder="Message…" value={text} onChange={(e) => setText(e.target.value)} />
           <div className="row">
@@ -138,19 +201,28 @@ export function Messages() {
             {sent && <span className="muted">delivered · {sent.slice(0, 12)}…</span>}
           </div>
         </div>
-        {state && state.recipients.length > 0 && (
-          <p className="muted" style={{ marginTop: 10 }}>
-            Your wire currently covers {state.recipients.length} approved{' '}
-            {state.recipients.length === 1 ? 'contact' : 'contacts'}. Sending to anyone else is refused until
-            you approve them at your Home.
-          </p>
+        {coverage && (
+          <p className="muted" style={{ marginTop: 10 }}>{coverage}</p>
         )}
       </div>
 
       <div className="panel">
         <h2>Inbox</h2>
         <p className="muted">Read from your Home, which holds your inbox — this app keeps no copy.</p>
-        {inboxRefusal && <ErrorLine error={inboxRefusal} />}
+        {inboxRefusal?.code === 'read_grant' ? (
+          <div className="notice" style={{ marginTop: 10 }}>
+            <strong>Authorize Commons to read your inbox once</strong>
+            <p style={{ margin: '4px 0 8px' }}>
+              Your messages live at your Home. Commons cannot see them until you sign a read-only
+              grant for this app — and you can withdraw it for Commons alone.
+            </p>
+            {inboxRefusal.ceremonyUrl && (
+              <a href={inboxRefusal.ceremonyUrl}>Authorize — then return here →</a>
+            )}
+          </div>
+        ) : (
+          inboxRefusal && <ErrorLine error={inboxRefusal} />
+        )}
         <div style={{ marginTop: 10 }}>
           {!inboxRefusal && inbox.length === 0 && <Empty>Nothing here yet.</Empty>}
           {inbox.map((m, i) => (

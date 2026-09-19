@@ -28,7 +28,15 @@ export function CeremonyNotice({ url, title, body }: { url: string; title: strin
  * delegation for that organization, so it presented nothing and the gate correctly refused. The
  * two are different problems with different fixes, and the refusal cannot tell them apart.
  */
-export function NotAuthorizedNotice({ orgName, steward }: { orgName: string; steward: boolean }) {
+export function NotAuthorizedNotice({
+  orgName,
+  steward,
+  member,
+}: {
+  orgName: string;
+  steward: boolean;
+  member?: boolean;
+}) {
   return (
     <div className="notice" style={{ marginBottom: 14 }}>
       <strong>This app cannot act for {orgName} yet</strong>
@@ -38,11 +46,17 @@ export function NotAuthorizedNotice({ orgName, steward }: { orgName: string; ste
           re-verifies it on-chain every call, and it will refuse one that is expired, revoked, or of the
           wrong shape. Re-connecting the community re-issues it.
         </p>
+      ) : member ? (
+        <p style={{ margin: '4px 0 0' }}>
+          You are a member of {orgName}. The gate still refused — usually the member-access grant is
+          missing from this session, or the community has not enabled storage. Refresh after signing
+          in again; do not use the steward &quot;connect a community&quot; ceremony.
+        </p>
       ) : (
         <p style={{ margin: '4px 0 0' }}>
-          It holds <strong>no stewardship delegation</strong> for this organization, so it presented no
-          proof and the gate refused — correctly. Re-connect the community so your Home issues one, or
-          join it as a member at your Home if you do not steward it.
+          It holds <strong>no stewardship or member-access grant</strong> for this organization, so it
+          presented no proof and the gate refused — correctly. Join as a member at your Home if you
+          were invited, or re-connect the community if you steward it.
         </p>
       )}
     </div>

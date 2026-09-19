@@ -92,6 +92,10 @@ export interface RelatedOrg {
   stewardshipDelegation?: DelegationWire;
   /** person→org: lets the org read its member's data. Separate decision, separate wire. */
   membershipDelegation?: DelegationWire;
+  /** org→member: the invitee's read grant. Present after an email/in-app invite, not after org-create. */
+  memberAccessDelegation?: DelegationWire;
+  /** `member` = invited in; `steward` = they custody the org. Defaults to steward for legacy links. */
+  relationship?: 'member' | 'steward';
   purpose?: string;
 }
 
@@ -175,7 +179,8 @@ export interface HomeConnect {
   /** Exchange `code`, verify the id_token, return the person. Throws `HomeConnectError`. */
   completeConnect(args: { start: ConnectStart; code: string; state: string }): Promise<ConnectResult>;
   /**
-   * Orgs this person has linked to THIS app, with their stewardship wires (spec 246 / ADR-0025).
+   * Orgs this person can act on here: links requested by this app, plus memberships from
+   * invites (`requestedBy: home-invite` never appears in the scoped list).
    *
    * Person↔org links are PRIVATE vault credentials — they are not public graph state and there
    * is no way to enumerate them from the chain. The Home is the only source, and it answers
@@ -209,6 +214,39 @@ export interface HomeConnect {
   decodeIdToken(idToken: string): PersonClaims;
   /** The person's SA from a token's `sub` / `canonical_agent_id`. */
   personOf(idToken: string): Address;
+}
+
+function asRelatedOrg(o: Record<string, unknown>): RelatedOrg | null {
+  if (typeof o.orgAgent !== 'string') return null;
+  return {
+    orgAgent: o.orgAgent as Address,
+    orgName: String(o.orgName ?? ''),
+    stewardshipDelegation: asDelegationWire(o.stewardshipDelegation),
+    membershipDelegation: asDelegationWire(o.membershipDelegation),
+    memberAccessDelegation: asDelegationWire(o.memberAccessDelegation),
+    purpose: typeof o.purpose === 'string' ? o.purpose : undefined,
+    relationship: o.relationship === 'member' ? 'member' : 'steward',
+  };
+}
+
+/** One bounded read of `/connect/related-orgs`. Empty on timeout or a non-OK — an answer, not a hang. */
+async function readRelatedOrgs(idToken: string, url: URL): Promise<RelatedOrg[]> {
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 12_000);
+  try {
+    const r = await fetch(url.toString(), {
+      headers: { authorization: `Bearer ${idToken}` },
+      signal: ctrl.signal,
+    });
+    if (!r.ok) return [];
+    const body = (await r.json().catch(() => ({}))) as { orgs?: Record<string, unknown>[] };
+    if (!Array.isArray(body.orgs)) return [];
+    return body.orgs.map(asRelatedOrg).filter((o): o is RelatedOrg => o !== null);
+  } catch {
+    return [];
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 export function createHomeConnect(config: HomeConnectConfig): HomeConnect {
@@ -327,34 +365,23 @@ export function createHomeConnect(config: HomeConnectConfig): HomeConnect {
       if (!trustsIssuer(authOrigin)) {
         throw new HomeConnectError('issuer_not_allowed', `refusing to read orgs from ${authOrigin}`);
       }
-      const url = new URL('/connect/related-orgs', authOrigin);
-      url.searchParams.set('client_id', config.clientId);
-      // BOUNDED. A stalled cross-origin read must not hang the page that called it. On timeout
-      // the answer is "none" — an answer, not a hang, and not a retry against a different route.
-      const ctrl = new AbortController();
-      const timer = setTimeout(() => ctrl.abort(), 12_000);
-      try {
-        const r = await fetch(url.toString(), {
-          headers: { authorization: `Bearer ${idToken}` },
-          signal: ctrl.signal,
-        });
-        if (!r.ok) return [];
-        const body = (await r.json().catch(() => ({}))) as { orgs?: Record<string, unknown>[] };
-        if (!Array.isArray(body.orgs)) return [];
-        return body.orgs
-          .filter((o) => typeof o.orgAgent === 'string')
-          .map((o) => ({
-            orgAgent: o.orgAgent as Address,
-            orgName: String(o.orgName ?? ''),
-            stewardshipDelegation: asDelegationWire(o.stewardshipDelegation),
-            membershipDelegation: asDelegationWire(o.membershipDelegation),
-            purpose: typeof o.purpose === 'string' ? o.purpose : undefined,
-          }));
-      } catch {
-        return [];
-      } finally {
-        clearTimeout(timer);
-      }
+      const scoped = new URL('/connect/related-orgs', authOrigin);
+      scoped.searchParams.set('client_id', config.clientId);
+      // Unscoped is the person's own view. Invite memberships are written as
+      // `requestedBy: home-invite`, so they never appear in the scoped list — and sending the
+      // invitee through `org-create` to "connect" an org they already joined is how you get
+      // `sender_mismatch` (they do not custody it).
+      const own = new URL('/connect/related-orgs', authOrigin);
+      const [appOrgs, personOrgs] = await Promise.all([
+        readRelatedOrgs(idToken, scoped),
+        readRelatedOrgs(idToken, own),
+      ]);
+      const seen = new Set(appOrgs.map((o) => o.orgAgent.toLowerCase()));
+      const invited = personOrgs.filter((o) => {
+        if (seen.has(o.orgAgent.toLowerCase())) return false;
+        return o.relationship === 'member' || !!o.memberAccessDelegation;
+      });
+      return [...appOrgs, ...invited];
     },
 
     listDemoIdentities: () =>

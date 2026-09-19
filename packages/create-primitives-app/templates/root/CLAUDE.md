@@ -1,6 +1,6 @@
 # Claude guide
 
-Read [`AGENTS.md`](AGENTS.md) first — it holds the binding rules for every assistant, and the four
+Read [`AGENTS.md`](AGENTS.md) first — it holds the binding rules for every assistant, and the five
 instincts this substrate requires you to override. This file is the map.
 
 ## Layout
@@ -16,8 +16,15 @@ packages/create-primitives-app   npx create-primitives-app — scaffold a produc
 packages/home-connect     relying-app OIDC: startConnect → completeConnect
 packages/interactions-client  typed ops: topics, messages, library, inbox
 packages/catalog          every published @agenticprimitives package, import-checked
+packages/dev-mcp          read-only Developer MCP server — release facts as tools
+release-manifest.json     the release binding: pins, deployments, skills, endpoints
+catalog/                  packages.json, contracts.json, skills.json — generated indexes
+contracts/                abis/ + per-contract deployment records (generated)
+skills/                   13 developer Agent Skills, projected to .claude/.cursor/.agents
+                          (runtime playbooks live in the separate skills corpus — see skills/README.md)
+articles/                 the 21-part LinkedIn series: the argument the kit backs up
 docs/                     principles, architecture, SDK, CLI, API, troubleshooting
-scripts/                  check-endpoints.mjs, check-packages.mjs
+scripts/                  check-endpoints, check-packages, generate/validate-release, doctor
 llms.txt                  machine-readable doc index
 ```
 
@@ -32,7 +39,14 @@ llms.txt                  machine-readable doc index
 | npm packages a builder imports | `docs/sdk.md` |
 | A refusal you do not understand | `docs/troubleshooting.md` — most are ceremonies, not bugs |
 | Which package does X | `docs/packages.md` |
+| A domain fact (whose treasury, who is a member) | `@agenticprimitives/ontology` — bind by IRI; never a prompt or a table |
+| Which control stops what, and who holds it | `docs/controls-catalog.md`; the argument in `docs/rails-not-throttles.md` |
+| What is being built, what is shipped, what is next | `docs/products.md` — offerings, products, the harness program, spec numbers |
+| Why the design is this way | [the series](https://github.com/agentictrustlabs/agentic-primitives/blob/main/articles/README.md) — one idea a day |
 | Contract addresses, delegation hashes | `docs/contracts.md` |
+| Which exact versions belong together | `release-manifest.json` + `docs/release-binding.md` |
+| Resolving an address or ABI | `contracts/deployments/` records — never copy from prose |
+| Task-specific procedure | the matching skill in `skills/` |
 | Registering an app at a Home | `docs/register-your-app.md` |
 
 ## The distinction everything rests on
@@ -61,19 +75,28 @@ someone else. Neither substitutes for the other, and the gate checks both indepe
 - **Your app cannot create an organization.** The person does, at their Home, custodied by their own
   credential. `org-create` is a ceremony you request, not an operation you perform.
 - **`@agenticprimitives/contracts` has no default entry point** — only subpaths
-  (`/deployments-json/base-sepolia`, `/abi`). That is deliberate, not a broken package.
+  (`/deployments-json/base-sepolia`, `/deployments`, `/abi`). That is deliberate, not a broken
+  package. The map is flat except `permissionlessSubregistries`, one typed-suffix subregistry each.
+- **Two chains ship in the package.** Base Sepolia is public and verified by `doctor:full`. The
+  estate chain (`34348`) is where `DigestBindingEnforcer` runs; its RPC is gated, so its records are
+  resolved, never verified, from here.
+- **A mandate is not a type.** It is a delegation carrying a `digestBinding` caveat and a `payment`
+  caveat. Do not invent a `Mandate` object; do not let a plan lower a tool's declared risk.
 
 ## Validation
 
 ```sh
 pnpm typecheck              # all workspace packages
 pnpm check:endpoints        # the live rails, ~5s — catches drift nothing else can
-pnpm check:packages         # all 66 published packages, imported for real
+pnpm check:packages         # all 75 published packages, imported for real
+pnpm release:validate       # release surfaces consistent, ABI digests, override pins
+pnpm doctor:full            # npm pins + endpoints + eth_getCode per deployment
 pnpm --filter @starter/commons build
 ```
 
 ## Status
 
-Reference deployments on Base Sepolia testnet. Sessions are demo-grade by design. The packages are
-alpha across two concurrent release lines — pin exactly, and pin the transitive tree with
-`pnpm.overrides` (see the root `package.json`).
+Reference deployments on Base Sepolia testnet; the mandate path is live on a private estate chain.
+Sessions are demo-grade by design. The packages are alpha across two concurrent release lines
+(`1.0.0-alpha.24` and `0.0.0-alpha.N`) — pin exactly, and pin the transitive tree with
+`pnpm.overrides` (see the root `package.json`, or `catalog/packages.json` for the whole set).

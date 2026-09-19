@@ -7,9 +7,9 @@ patterns this stack exists to replace — bearer-as-authority, app-owned user da
 — and every one of those will typecheck, look reasonable in review, and fail at a gate or, worse,
 not fail at all.
 
-So the job is less "explain the API" and more "prevent four specific instincts".
+So the job is less "explain the API" and more "prevent five specific instincts".
 
-## The four instincts to override
+## The five instincts to override
 
 Put these in your system prompt, your `CLAUDE.md`, or your Cursor rules. Verbatim is fine.
 
@@ -23,6 +23,9 @@ Put these in your system prompt, your `CLAUDE.md`, or your Cursor rules. Verbati
 > 4. **A refusal is usually a missing ceremony.** `storage_not_enabled`, `messaging_not_approved`,
 >    `read_grant_absent` mean a person must sign something at their Home. Render a link. Never
 >    retry, never work around.
+> 5. **Domain shape lives in the ontology.** Whose treasury, who is a member, what an intent is —
+>    those are terms in `@agenticprimitives/ontology`, bound by IRI. Never a prompt, a lookup
+>    table, or a name-similarity guess.
 
 `AGENTS.md` and `CLAUDE.md` at the repo root already carry these, so an assistant working inside a
 clone picks them up automatically. `npx create-primitives-app` copies the same files into
@@ -84,7 +87,7 @@ belongs in the owner's vault; use `interactions.putArtifact` and let the gate de
 ## Cursor specifically
 
 `.cursor/rules/agentic-primitives.mdc` is loaded automatically for every file in this repo. It is
-a compressed form of the four instincts plus the op reference. Keep it short — a rule file that
+a compressed form of the five instincts plus the op reference. Keep it short — a rule file that
 grows past a screen stops being read, by people and by models alike.
 
 ## A note on what "vibe coding" can and cannot do here

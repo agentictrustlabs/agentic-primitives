@@ -20,7 +20,7 @@ interface DemoIdentity {
   custodies: { sa: string; name: string }[];
 }
 
-export function Connect() {
+export function Connect({ joinedName }: { joinedName?: string | null }) {
   const [name, setName] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<CommonsError | null>(null);
@@ -52,6 +52,12 @@ export function Connect() {
     <>
       <div className="panel">
         <h2>Connect with your Home</h2>
+        {joinedName && (
+          <p>
+            You joined as <strong>{joinedName}</strong>. Sign in here to open that community — Commons
+            never sees the credential you just used at your Home.
+          </p>
+        )}
         <p className="muted">
           Commons never sees a password, a passkey, or a private key. Your Home runs the ceremony and hands
           this app one short-lived token that proves who you are — and authorizes nothing on its own.
@@ -124,8 +130,8 @@ function DemoPane({
     setBusy(handle);
     setError(null);
     try {
-      await api.post('/api/connect/demo', { handle });
-      window.location.href = '/';
+      const r = await api.post<{ homeHandoff?: string }>('/api/connect/demo', { handle });
+      window.location.href = r.homeHandoff || '/';
     } catch (e) {
       if (e instanceof CommonsError) setError(e);
       setBusy('');
@@ -169,11 +175,9 @@ function DemoPane({
             ))}
           </div>
           <p className="muted" style={{ fontSize: 12, marginTop: 8 }}>
-            Sign-in, identity and messaging work immediately as any of these. <strong>Discussion and the
-            library will not</strong> until you connect a community here — and that ceremony runs at the
-            Home, which these shared accounts have no keyless route into, so it needs a browser sign-in
-            there first. Said plainly rather than left to be discovered: the org surfaces are the ones a
-            shared account cannot reach on its own today.
+            Connecting as one signs you in here and then at your Home (same session the Home already
+            minted — the browser just was not there to receive the cookie). Discussion and the library
+            still need a community connected here.
           </p>
         </div>
       )}

@@ -339,6 +339,39 @@
     "stateMutability": "nonpayable"
   },
   {
+    "type": "function",
+    "name": "updateEntry",
+    "inputs": [
+      {
+        "name": "registryId",
+        "type": "bytes32",
+        "internalType": "bytes32"
+      },
+      {
+        "name": "entryId",
+        "type": "bytes32",
+        "internalType": "bytes32"
+      },
+      {
+        "name": "cardHash",
+        "type": "bytes32",
+        "internalType": "bytes32"
+      },
+      {
+        "name": "bindingProofHash",
+        "type": "bytes32",
+        "internalType": "bytes32"
+      },
+      {
+        "name": "claimHashes",
+        "type": "bytes32[]",
+        "internalType": "bytes32[]"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
     "type": "event",
     "name": "RegistryClaimUpdated",
     "inputs": [
@@ -499,6 +532,37 @@
       },
       {
         "name": "reasonHash",
+        "type": "bytes32",
+        "indexed": false,
+        "internalType": "bytes32"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "RegistryEntryUpdated",
+    "inputs": [
+      {
+        "name": "registryId",
+        "type": "bytes32",
+        "indexed": true,
+        "internalType": "bytes32"
+      },
+      {
+        "name": "entryId",
+        "type": "bytes32",
+        "indexed": true,
+        "internalType": "bytes32"
+      },
+      {
+        "name": "cardHash",
+        "type": "bytes32",
+        "indexed": false,
+        "internalType": "bytes32"
+      },
+      {
+        "name": "bindingProofHash",
         "type": "bytes32",
         "indexed": false,
         "internalType": "bytes32"

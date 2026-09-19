@@ -14,7 +14,7 @@ Most "bugs" against this substrate are one of two things:
 
 ```sh
 pnpm check:endpoints    # are the live rails answering as documented?
-pnpm check:packages     # do all 66 published packages still import?
+pnpm check:packages     # do all 75 published packages still import?
 ```
 
 If `check:endpoints` passes and your call still fails, the refusal is typed — look the `code` up

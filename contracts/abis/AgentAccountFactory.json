@@ -36,6 +36,11 @@
         "name": "approvedHashRegistry_",
         "type": "address",
         "internalType": "address"
+      },
+      {
+        "name": "relaxedT4Floor_",
+        "type": "bool",
+        "internalType": "bool"
       }
     ],
     "stateMutability": "nonpayable"
@@ -279,6 +284,19 @@
   {
     "type": "function",
     "name": "paused",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "bool",
+        "internalType": "bool"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "relaxedT4Floor",
     "inputs": [],
     "outputs": [
       {

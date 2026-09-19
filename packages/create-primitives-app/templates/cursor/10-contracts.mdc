@@ -1,0 +1,12 @@
+---
+description: Contract and chain integration rules.
+globs: ["**/*.sol", "**/contracts/**", "**/*contract*.ts", "**/*deployment*.json"]
+alwaysApply: false
+---
+
+- Assert chain ID before resolving a deployment.
+- Use typed ABIs and clients from the selected release.
+- Verify runtime code and proxy implementation for security-critical paths.
+- Simulate state-changing calls before sending.
+- Add positive, failure, chain-mismatch, and authority-boundary tests.
+- Do not edit generated ABI/deployment files directly.

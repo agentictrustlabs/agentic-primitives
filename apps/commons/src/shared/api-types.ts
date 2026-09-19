@@ -15,6 +15,8 @@ export interface OrgSummary {
   name: string;
   /** Do we hold a stewardship wire for this org? Without one, org surfaces are read-only-at-best. */
   steward: boolean;
+  /** Do we hold a member-access grant for this org? That is what lets a non-steward enter channels. */
+  member: boolean;
   /** keccak256 of the stewardship delegation — the value an on-chain revoke would name. */
   delegationHash?: string;
   storage: { granted: boolean; current: boolean };
@@ -52,6 +54,12 @@ export interface LibraryEntry {
 export interface MessagingState {
   wirePresent: boolean;
   recipients: string[];
+  /** The name-registry class: any agent that currently holds a public name (sender must hold one too). */
+  namedToNamed: boolean;
+  /** Org-scope classes: current members of these communities, resolved live at send time. */
+  communities: { address: string; name: string }[];
+  /** Exact-address leftovers — people approved one-by-one, not a class. */
+  contacts: string[];
   /** Where the person goes to approve messaging. Their credential lives there, not here. */
   approveUrl: string;
 }

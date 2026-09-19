@@ -49,8 +49,13 @@ not possible — the grant is a delegation the owner signs.
 
 ## Discussion — an organization's topics
 
-Principal: the **organization**. Caller must be a member (has published a directory listing) or a
-steward (presents the wire).
+Principal: the **organization**. Caller must present one of: a current directory listing, an
+org→member `memberAccess` grant, or stewardship.
+
+How they are known is a facet, not the identity. `you` is their org-local name (or a listing
+`displayName`, or `Steward`). The canonical person address is never the author name. A member
+admitted only by `memberAccess` must call `directory.setLocalName` before `channels.create` or
+`channels.post`.
 
 | Op | Body | Returns |
 | --- | --- | --- |
@@ -79,7 +84,8 @@ const topic = await interactions.readTopic(org, topicId, { session, stewardship 
 
 | Op | Body | Returns |
 | --- | --- | --- |
-| `directory.list` | — | `{ listings: [{ listing, … }] }` |
+| `directory.list` | — | `{ listings: [{ listing, … }], you }` |
+| `directory.setLocalName` | `{ displayName }` | `{ you }` |
 | `directory.publish` | `{ listing }` | — |
 | `directory.revoke` | `{ subject }` | — |
 

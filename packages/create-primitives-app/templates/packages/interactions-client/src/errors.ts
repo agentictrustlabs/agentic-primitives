@@ -26,6 +26,8 @@ export type InteractionsErrorCode =
   | 'read_grant'
   /** The gate said no — not a member, not a steward, not a participant. */
   | 'not_authorized'
+  /** Admitted, but this community does not yet have a local name for them. */
+  | 'local_name_required'
   | 'not_found'
   | 'conflict'
   | 'server_error'

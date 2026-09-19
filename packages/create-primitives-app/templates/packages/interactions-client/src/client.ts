@@ -43,6 +43,13 @@ export interface InteractionsClient {
   ): Promise<{ topicId: string }>;
   /** Post to a topic. The body is written to the ORG's vault under the envelope's own resource. */
   postToTopic(org: string, input: { topicId: string; text: string }, auth: CallerAuth): Promise<{ messageId: string }>;
+  /**
+   * Set how this person is known in this organization.
+   *
+   * An org-local facet — not a public handle, not a new identity. The address stays the key.
+   * Required before a member without a directory listing can open or post to a topic.
+   */
+  setLocalName(org: string, displayName: string, auth: CallerAuth): Promise<{ you: string }>;
 
   // ── Community directory ───────────────────────────────────────────────────────────────────
   /**
@@ -111,6 +118,7 @@ function withAuth(auth: CallerAuth, extra: Record<string, unknown> = {}): Record
   return {
     session: auth.session,
     ...(auth.stewardship ? { stewardship: auth.stewardship } : {}),
+    ...(auth.memberAccess ? { memberAccess: auth.memberAccess } : {}),
     ...extra,
   };
 }
@@ -207,6 +215,11 @@ export function createInteractionsClient(config: InteractionsClientConfig): Inte
     async postToTopic(org, input, auth) {
       const body = await t.call(org, 'channels.post', withAuth(auth, { channelId: input.topicId, bodyText: input.text }));
       return { messageId: String(body.messageId ?? '') };
+    },
+
+    async setLocalName(org, displayName, auth) {
+      const body = await t.call(org, 'directory.setLocalName', withAuth(auth, { displayName }));
+      return { you: String(body.you ?? displayName) };
     },
 
     async listMembers(org, auth) {

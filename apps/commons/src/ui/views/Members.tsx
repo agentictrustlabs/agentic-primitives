@@ -6,6 +6,10 @@ import { Empty, ErrorLine, NotAuthorizedNotice } from './parts.js';
 interface DirectoryMember {
   subject?: string;
   displayName?: string;
+  /** How this org knows them (chosen facet), when they set one. */
+  localName?: string;
+  /** Their CURRENT naming-service name, resolved live by the org's agent — absent for the nameless. */
+  publicName?: string;
   publishedAt?: string;
   [k: string]: unknown;
 }
@@ -71,16 +75,16 @@ export function Members({ org }: { org: OrgSummary | null }) {
   return (
     <>
       {error?.code === 'not_authorized' ? (
-        <NotAuthorizedNotice orgName={org.name} steward={org.steward} />
+        <NotAuthorizedNotice orgName={org.name} steward={org.steward} member={org.member} />
       ) : (
         error && <ErrorLine error={error} onDismiss={() => setError(null)} />
       )}
 
       <div className="panel">
-        <h2>Invite someone to {org.name}</h2>
+        <h2>Invite someone to {org.name} on Commons</h2>
         <p className="muted">
-          They join as a <strong>member</strong> — admitted to this community&apos;s channels, and granted
-          nothing over the organization itself.
+          They join this community as a <strong>member</strong> — admitted to its channels, granted
+          nothing over the organization itself — and come back here, signed in to Commons.
         </p>
         {/*
           NOT a form that posts an email from here, and the reason is the whole architecture.
@@ -116,7 +120,7 @@ export function Members({ org }: { org: OrgSummary | null }) {
             >
               Invite at your Home →
             </a>
-            <span className="muted">opens {org.name}&apos;s invite page</span>
+            <span className="muted">opens your Home — they return to Commons in {org.name}</span>
           </div>
         )}
       </div>
@@ -131,7 +135,17 @@ export function Members({ org }: { org: OrgSummary | null }) {
           {members.length === 0 && loaded && <Empty>Nobody has published a listing here yet.</Empty>}
           {members.map((m, i) => (
             <div key={String(m.subject ?? i)} className="item">
-              <strong>{m.displayName || 'Member'}</strong>
+              <div className="row">
+                <strong>{m.localName || m.displayName || 'Member'}</strong>
+                {/* The public name is a different fact from the org-local one: it is who they are to
+                    the WORLD, resolved live from the naming service. Absent means nameless — a full
+                    member here, deliberately unreachable by name anywhere else. */}
+                {m.publicName ? (
+                  <span className="badge">{m.publicName}</span>
+                ) : (
+                  <span className="muted" style={{ fontSize: 12 }}>no public name</span>
+                )}
+              </div>
               <p className="meta addr">{String(m.subject ?? '')}</p>
             </div>
           ))}

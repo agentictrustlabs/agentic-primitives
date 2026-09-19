@@ -27,6 +27,9 @@ replace(join(repo, 'packages', 'home-connect'), join(dest, 'packages', 'home-con
 replace(join(repo, 'packages', 'interactions-client'), join(dest, 'packages', 'interactions-client'));
 replace(join(repo, 'packages', 'catalog'), join(dest, 'packages', 'catalog'));
 replace(join(repo, 'docs'), join(dest, 'docs'));
+// The diagrams (several MB of PNG) stay out of the published scaffold; the docs that embed them
+// use absolute URLs, so nothing in a generated project points at a missing file.
+rmSync(join(dest, 'docs', 'assets'), { recursive: true, force: true });
 replace(join(repo, 'scripts'), join(dest, 'scripts'));
 
 mkdirSync(join(dest, 'cursor'), { recursive: true });

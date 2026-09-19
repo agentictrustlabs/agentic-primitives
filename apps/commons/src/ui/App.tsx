@@ -16,6 +16,7 @@ interface HomeLinks {
   enableMessaging: string;
   organizations: string;
   connectedApps: string;
+  logout?: string;
 }
 
 export function App() {
@@ -26,6 +27,8 @@ export function App() {
   const [tab, setTab] = useState<Tab>('discussion');
   const [error, setError] = useState<CommonsError | null>(null);
   const [booting, setBooting] = useState(true);
+  const [joinedName, setJoinedName] = useState<string | null>(null);
+  const [joinedAs, setJoinedAs] = useState<string | null>(null);
 
   const loadMe = useCallback(async () => {
     const r = await api.get<{ me: Me | null; home?: HomeLinks }>('/api/me');
@@ -52,6 +55,37 @@ export function App() {
       const params = new URLSearchParams(window.location.search);
       const code = params.get('code');
       const state = params.get('state');
+      const fromInvite = params.get('n');
+      const invitedOrg = (params.get('org') ?? '').toLowerCase();
+      const invitedAgent = (params.get('agent') ?? '').trim().toLowerCase();
+      const hash = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+      const homeHandoff = hash.get('session');
+      // Invite return (`n` / `org` / Home session) must survive the OIDC hop — the authorize
+      // URL will not carry them, and replaceState below would otherwise forget the community
+      // and drop the email home that just accepted.
+      const INVITE_ORG = 'commons:invite-org';
+      const INVITE_NAME = 'commons:invite-name';
+      const INVITE_HOME = 'commons:home-session';
+      const INVITE_AGENT = 'commons:invite-agent';
+      try {
+        if (fromInvite) sessionStorage.setItem(INVITE_NAME, fromInvite);
+        if (invitedOrg) sessionStorage.setItem(INVITE_ORG, invitedOrg);
+        if (homeHandoff) sessionStorage.setItem(INVITE_HOME, homeHandoff);
+        if (invitedAgent) sessionStorage.setItem(INVITE_AGENT, invitedAgent);
+      } catch {
+        /* storage blocked */
+      }
+      let stashedOrg = invitedOrg;
+      let stashedName = fromInvite;
+      let stashedAgent = invitedAgent;
+      try {
+        stashedOrg = invitedOrg || sessionStorage.getItem(INVITE_ORG) || '';
+        stashedName = fromInvite || sessionStorage.getItem(INVITE_NAME);
+        stashedAgent = invitedAgent || sessionStorage.getItem(INVITE_AGENT) || '';
+      } catch {
+        /* storage blocked */
+      }
+      if (stashedName) setJoinedName(stashedName);
       // A ceremony just ran ⇒ read past the cache. An org connected two seconds ago must not be
       // invisible because some isolate learned "none" three seconds ago.
       let justConnected = false;
@@ -62,22 +96,85 @@ export function App() {
         } catch (e) {
           if (e instanceof CommonsError) setError(e);
         }
-        // Strip the code from the URL whether it worked or not — a code is single-use, and
-        // leaving it in the address bar invites a reload that fails confusingly.
+      }
+      if (code || state || fromInvite || invitedOrg) {
         window.history.replaceState({}, '', window.location.pathname);
       }
       const who = await loadMe().catch(() => null);
-      if (who) await loadOrgs(justConnected);
+      if (!who && stashedName && !code) {
+        // Invitee just accepted at Home. A nameless authorize is the generic chooser —
+        // pin the claimed agent name, and only hop when we still have their Home session.
+        let handoff = homeHandoff;
+        try { handoff = homeHandoff || sessionStorage.getItem(INVITE_HOME); } catch { /* blocked */ }
+        if (!handoff) {
+          setBooting(false);
+          return;
+        }
+        try {
+          const r = await api.post<{ url: string }>('/api/connect/start', {
+            ...(stashedAgent ? { agentName: stashedAgent } : {}),
+          });
+          window.location.href = `${r.url}#session=${encodeURIComponent(handoff)}&via=email`;
+          return;
+        } catch (e) {
+          if (e instanceof CommonsError) setError(e);
+        }
+      }
+      if (who) {
+        await loadOrgs(justConnected || !!stashedName);
+        if (stashedOrg) setActiveOrg(stashedOrg);
+        try {
+          sessionStorage.removeItem(INVITE_ORG);
+          sessionStorage.removeItem(INVITE_NAME);
+          sessionStorage.removeItem(INVITE_HOME);
+          sessionStorage.removeItem(INVITE_AGENT);
+        } catch {
+          /* storage blocked */
+        }
+      }
       setBooting(false);
     })();
   }, [loadMe, loadOrgs]);
 
   const signOut = async () => {
+    const dest = home?.logout;
     await api.post('/api/logout');
+    if (dest) {
+      window.location.href = dest;
+      return;
+    }
     setMe(null);
     setOrgs([]);
     setActiveOrg('');
   };
+
+  // Home logout clears this cookie via /sso-logout. If that happened in another tab, drop the UI.
+  useEffect(() => {
+    if (!me) return;
+    const check = async () => {
+      try {
+        const r = await api.get<{ me: Me | null }>('/api/me');
+        if (!r.me) {
+          setMe(null);
+          setOrgs([]);
+          setActiveOrg('');
+        }
+      } catch {
+        /* a failed probe is not a logout */
+      }
+    };
+    const onVis = () => {
+      if (document.visibilityState === 'visible') void check();
+    };
+    document.addEventListener('visibilitychange', onVis);
+    const t = window.setInterval(() => {
+      if (document.visibilityState === 'visible') void check();
+    }, 5_000);
+    return () => {
+      document.removeEventListener('visibilitychange', onVis);
+      window.clearInterval(t);
+    };
+  }, [me]);
 
   if (booting) {
     return (
@@ -92,7 +189,7 @@ export function App() {
       <div className="shell">
         <Header me={null} />
         {error && <ErrorLine error={error} />}
-        <Connect />
+        <Connect joinedName={joinedName} />
       </div>
     );
   }
@@ -124,7 +221,7 @@ export function App() {
       {error && <ErrorLine error={error} onDismiss={() => setError(null)} />}
 
       {tab === 'discussion' && <Discussion org={org} />}
-      {tab === 'messages' && <Messages />}
+      {tab === 'messages' && <Messages org={org} />}
       {tab === 'library' && <Library org={org} />}
       {tab === 'members' && <Members org={org} />}
       {tab === 'substrate' && <Substrate me={me} orgs={orgs} />}
@@ -191,12 +288,14 @@ function OrgPicker({
       <div className="panel">
         <h2>No community connected</h2>
         <p className="muted">
-          Discussion and the library belong to an <em>organization</em> — a Smart Agent your own credential
-          custodies. Connect one and this app becomes its front end; the records stay in its vault.
+          Discussion and the library belong to an <em>organization</em>. If you were just invited, the
+          community should appear here after you sign in — do not use the button below for that.
+          That ceremony is for a community <em>you steward</em> (or a new one your credential
+          custodies). Sending a member through it is how you get <code>sender_mismatch</code>.
         </p>
         <div className="row" style={{ marginTop: 10 }}>
           <button className="primary" onClick={connectOrg} disabled={connecting}>
-            {connecting ? 'Opening your Home…' : 'Connect a community'}
+            {connecting ? 'Opening your Home…' : 'Create or link a community you steward'}
           </button>
           {homeUrl && (
             <a className="muted" href={homeUrl} target="_blank" rel="noreferrer">
@@ -223,11 +322,13 @@ function OrgPicker({
             </option>
           ))}
         </select>
-        {current?.steward && <span className="badge">steward</span>}
+        {current?.steward ? <span className="badge">steward</span> : <span className="badge">member</span>}
         {current && !current.storage.granted && <span className="badge">storage off</span>}
-        <button className="ghost" onClick={connectOrg} disabled={connecting}>
-          Connect another
-        </button>
+        {current?.steward && (
+          <button className="ghost" onClick={connectOrg} disabled={connecting}>
+            Connect another
+          </button>
+        )}
       </div>
       {current && !current.storage.granted && (
         <p className="muted" style={{ marginTop: 8 }}>

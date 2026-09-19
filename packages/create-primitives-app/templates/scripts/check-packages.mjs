@@ -50,8 +50,8 @@ async function entryPointOf(name) {
 const CATALOG = {
   'Identity & accounts': [
     'types', 'agent-account', 'agent-naming', 'agent-profile', 'agent-relationships',
-    'agent-resolution', 'account-custody', 'related-agents', 'organization', 'identity-directory',
-    'identity-directory-adapters', 'browser-identity',
+    'agent-resolution', 'registry-resolution', 'account-custody', 'related-agents', 'organization',
+    'identity-directory', 'identity-directory-adapters', 'browser-identity',
   ],
   'Authority & custody': [
     'delegation', 'delegated-signer', 'key-custody', 'key-authorization', 'agentic-authorization',
@@ -60,9 +60,12 @@ const CATALOG = {
   'Connect & the Home': [
     'connect', 'connect-auth', 'connect-client', 'fedcm-idp', 'fedcm-rp', 'home',
   ],
+  'Acting: the harness': [
+    'harness', 'orchestration', 'orchestration-anthropic', 'orchestration-openai-compat',
+    'context', 'evaluation', 'service-agent',
+  ],
   'Interaction & coordination': [
-    'a2a', 'fabric', 'coordination', 'situations', 'orchestration', 'orchestration-anthropic',
-    'service-agent',
+    'a2a', 'fabric', 'coordination', 'collaboration', 'situations',
   ],
   'Capability & tools': [
     'agent-skills', 'capability-claims', 'tool-policy', 'mcp-runtime', 'mcp-protocol', 'mcp-oauth',
@@ -72,12 +75,16 @@ const CATALOG = {
     'content-primitives', 'content-storage', 'verifiable-credentials', 'privacy-credentials',
     'attestations', 'provenance', 'verification-receipts', 'witness', 'ontology',
   ],
-  'Commerce & fulfilment': [
-    'payments', 'agreements', 'intent-marketplace', 'intent-resolver', 'fulfillment',
+  'Commerce & engagement': [
+    'payments', 'agreements', 'intent-engagement', 'intent-marketplace', 'intent-resolver',
+    'fulfillment',
   ],
   'Infrastructure': [
     'audit', 'chain-state', 'chain-state-viem', 'contracts', 'edge-runtime', 'edge-cloudflare',
     'rate-control', 'rate-control-cloudflare', 'registry-kit', 'geo-features',
+  ],
+  'Developer Kit': [
+    'devkit', 'create-app',
   ],
 };
 

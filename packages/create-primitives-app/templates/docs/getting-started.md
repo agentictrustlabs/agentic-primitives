@@ -8,9 +8,15 @@ published npm packages and the live Home / A2A / MCP rails.
 
 ```sh
 npx create-primitives-app@latest my-app
-# from a clone of this repo:
-pnpm create-app my-app
+cd my-app
+# register client_id at your Home — docs/register-your-app.md
+cp apps/web/.dev.vars.example apps/web/.dev.vars
+pnpm dev
 ```
+
+From a clone of this repo: `pnpm create-app my-app`, or
+`node packages/create-primitives-app/bin/cli.js my-app`. Until the package is on npm, those are
+the paths that work. Full CLI: [create-app.md](./create-app.md).
 
 That produces a pnpm workspace with:
 

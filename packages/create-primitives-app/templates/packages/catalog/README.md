@@ -7,17 +7,17 @@ It exists so `pnpm install` in this repo pulls the entire published surface, and
 that it would work.
 
 ```sh
-pnpm check:packages                      # registry versions + a live import check for all 66
+pnpm check:packages                      # registry versions + a live import check for all 75
 pnpm --filter @starter/catalog test      # import check only, offline
 ```
 
 ```
-66 packages · 65 installed and importing · 0 broken
+75 packages · 75 installed and importing · 0 unpublished · 0 broken
 ```
 
 ## Why this is worth a package
 
-The substrate ships ~66 libraries with a dense peer graph. The failure most third-party developers
+The substrate ships 75 libraries with a dense peer graph. The failure most third-party developers
 hit first is not "the API is wrong" — it is **"this package does not resolve in my runtime"**: an
 ESM-only entry point, a missing peer, a package that publishes only subpaths.
 
@@ -27,7 +27,8 @@ of a mystery you hit in week two.
 ## What the check knows
 
 - **Not published** — the package is in the catalog but not on npm yet. A fact about the upstream
-  release train, noted and never fatal. `vault-authority` is currently the one.
+  release train, noted and never fatal. Nothing is in that state in this release; two upstream
+  packages (`acp`, `runtime-member`) are not yet published and so are not in the catalog at all.
 - **Subpaths only** — installed, deliberately has no default entry. `contracts` is the case: it
   ships ABIs and deployment JSON under explicit subpaths and nothing at `.`. Reporting that as
   broken would be wrong.

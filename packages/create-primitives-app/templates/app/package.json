@@ -12,12 +12,12 @@
     "test": "echo \"(no tests)\""
   },
   "dependencies": {
-    "@agenticprimitives/agent-account": "1.0.0-alpha.21",
-    "@agenticprimitives/connect-auth": "1.0.0-alpha.21",
-    "@agenticprimitives/contracts": "1.0.0-alpha.21",
-    "@agenticprimitives/delegation": "1.0.0-alpha.21",
-    "@agenticprimitives/key-custody": "1.0.0-alpha.21",
-    "@agenticprimitives/types": "1.0.0-alpha.21",
+    "@agenticprimitives/agent-account": "1.0.0-alpha.26",
+    "@agenticprimitives/connect-auth": "1.0.0-alpha.26",
+    "@agenticprimitives/contracts": "1.0.0-alpha.26",
+    "@agenticprimitives/delegation": "1.0.0-alpha.26",
+    "@agenticprimitives/key-custody": "1.0.0-alpha.26",
+    "@agenticprimitives/types": "1.0.0-alpha.26",
     "@starter/home-connect": "workspace:*",
     "@starter/interactions-client": "workspace:*",
     "hono": "^4.6.14",

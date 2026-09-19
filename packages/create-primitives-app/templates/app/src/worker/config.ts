@@ -77,13 +77,14 @@ export function buildConfig(env: Env): AppConfig {
 
 export const homeCeremonyUrls = (
   homeOrigin: string,
-  ctx: { returnTo?: string; org?: string; homeSession?: string } = {},
+  ctx: { returnTo?: string; org?: string; app?: string; homeSession?: string } = {},
 ) => {
   const handoff = ctx.homeSession ? `#session=${encodeURIComponent(ctx.homeSession)}` : '';
   const withCtx = (path: string): string => {
     const u = new URL(path, homeOrigin);
     if (ctx.returnTo) u.searchParams.set('return', ctx.returnTo);
     if (ctx.org) u.searchParams.set('org', ctx.org);
+    if (ctx.app) u.searchParams.set('app', ctx.app);
     return u.toString() + handoff;
   };
   return {
@@ -91,6 +92,6 @@ export const homeCeremonyUrls = (
     approveMessaging: `${homeOrigin}/messages${handoff}`,
     organizations: `${homeOrigin}/organizations${handoff}`,
     connectedApps: `${homeOrigin}/apps${handoff}`,
-    inviteToOrg: (org: string): string => `${homeOrigin}/org/${org.toLowerCase()}/invite${handoff}`,
+    inviteToOrg: (org: string): string => withCtx(`/org/${org.toLowerCase()}/members`),
   };
 };

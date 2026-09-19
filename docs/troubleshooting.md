@@ -89,16 +89,23 @@ does not imply it, and that separation is the point.
 
 ### `403 · join this community first`
 
-Neither a member nor a steward of that organization. Either the person has no directory listing
-there, or you did not send the `stewardship` wire. Check `listRelatedOrgs` actually returned one:
+Neither a member nor a steward of that organization. Send the proof you actually hold:
+
+- steward → `stewardship`
+- invited member → `memberAccess` (from `listRelatedOrgs`)
+- listed member → a current directory listing (the gate re-verifies it)
 
 ```ts
 const orgs = await connect.listRelatedOrgs(idToken, authOrigin);
-console.log(orgs.map((o) => [o.orgName, !!o.stewardshipDelegation]));
+console.log(orgs.map((o) => [o.orgName, !!o.stewardshipDelegation, !!o.memberAccessDelegation]));
 ```
 
-Empty array usually means the person has not connected an organization to *this* app yet. Run the
-`org-create` ceremony.
+Empty array usually means the person has not connected an organization to *this* app yet. A
+steward runs `org-create`. An invitee should already appear after sign-in — do not send them
+through `org-create`.
+
+A member who can list topics but cannot post needs `directory.setLocalName` — an org-local
+name, not their agent address.
 
 ### `401 · invalid session: not a 3-part JWT`
 

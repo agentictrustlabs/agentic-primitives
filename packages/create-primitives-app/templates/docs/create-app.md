@@ -28,7 +28,7 @@ already owns it on npm.)
   packages/
     home-connect               relying-app OIDC
     interactions-client        vault-backed ops
-    catalog                    optional — all 66 published packages
+    catalog                    optional — all 75 published packages
   apps/web                     Worker + SPA: Connect, orgs, chain. No product features.
 ```
 
@@ -41,7 +41,7 @@ Commons is **not** copied. It stays in this public repo as the worked example.
 | `[directory]` | Where to write the project |
 | `--name` | Display name |
 | `--client-id` | Home `client_id` (3–40 chars, `[a-z0-9-]`) |
-| `--with-catalog` | Include the 66-package import harness |
+| `--with-catalog` | Include the 75-package import harness |
 | `--yes`, `-y` | No prompts |
 | `--skip-install` | Do not run `pnpm install` |
 | `--no-git` | Do not `git init` + initial commit |

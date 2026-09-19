@@ -44,12 +44,14 @@ export interface TransportConfig {
   timeoutMs?: number;
 }
 
-/** The credentials a caller presents. `stewardship` is required only for org-scoped ops. */
+/** The credentials a caller presents. Org-scoped ops carry stewardship and/or member-access. */
 export interface CallerAuth {
   /** The Home-issued id_token for the connected person. */
   session: string;
-  /** The org→person stewardship delegation, when acting for an organization. */
+  /** The org→person stewardship delegation, when acting as a steward of an organization. */
   stewardship?: DelegationWire;
+  /** The org→member member-access grant, when acting as a member rather than a steward. */
+  memberAccess?: DelegationWire;
 }
 
 export interface RawResult {
@@ -116,6 +118,7 @@ export function createTransport(config: TransportConfig) {
 
 function classify(status: number, serverCode: string, message: string): InteractionsErrorCode {
   if (serverCode === 'owner_only') return 'owner_only';
+  if (serverCode === 'local_name_required') return 'local_name_required';
   if (serverCode.startsWith('read_grant')) return 'read_grant';
   if (serverCode === 'wire_absent' || serverCode === 'recipient_not_in_wire') return 'messaging_not_approved';
   if (status === 401) return 'session_invalid';

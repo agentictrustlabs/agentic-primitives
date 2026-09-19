@@ -108,6 +108,7 @@ export async function orgAuth(
   return {
     session: session.idToken,
     ...(org.stewardshipDelegation ? { stewardship: org.stewardshipDelegation } : {}),
+    ...(org.memberAccessDelegation ? { memberAccess: org.memberAccessDelegation } : {}),
   };
 }
 
@@ -293,7 +294,19 @@ app.post('/api/connect/demo', async (c) => {
     const headers = new Headers();
     headers.append('set-cookie', jar.setSession(await seal(session, cfg.sessionSecret), ttl));
     headers.append('set-cookie', jar.clearOrg());
-    return c.json({ person: session.person, agentName: session.agentName }, { headers });
+    const homeHandoff = result.homeSession
+      ? (() => {
+          const u = new URL('/', cfg.homeOrigin);
+          const frag = new URLSearchParams();
+          frag.set('session', result.homeSession);
+          frag.set('return', cfg.redirectUri);
+          return `${u.origin}${u.pathname}#${frag.toString()}`;
+        })()
+      : null;
+    return c.json(
+      { person: session.person, agentName: session.agentName, ...(homeHandoff ? { homeHandoff } : {}) },
+      { headers },
+    );
   } catch (e) {
     return toResponse(e, cfg, handoffOf(c));
   }
@@ -305,6 +318,15 @@ app.post('/api/logout', (c) => {
   headers.append('set-cookie', jar.clearSession());
   headers.append('set-cookie', jar.clearOrg());
   return c.json({ ok: true }, { headers });
+});
+
+app.get('/sso-logout', (c) => {
+  const jar = cookieHeaders(c.req.url);
+  const headers = new Headers();
+  headers.append('set-cookie', jar.clearSession());
+  headers.append('set-cookie', jar.clearOrg());
+  headers.set('location', '/');
+  return new Response(null, { status: 302, headers });
 });
 
 app.get('/api/orgs', async (c) => {

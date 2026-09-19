@@ -1,9 +1,12 @@
 # Agentic Primitives
 
-Developer kit for building apps on the Agentic Primitives substrate: 66 `@agenticprimitives/*`
-npm packages, Ethereum contracts on Base Sepolia, and three live services (Home, A2A, MCP).
+Developer kit for building apps on the Agentic Primitives substrate: 75 `@agenticprimitives/*`
+npm packages, Ethereum contracts on Base Sepolia (public) and the estate chain (gated), and three
+live services (Home, A2A, MCP).
 
-A token says WHO. A delegation says WHAT. Records live in the owner's vault, not the app.
+The agent is an account (the anchor); names, cards, and registry entries are projections of it.
+A token says WHO. A delegation says WHAT — and a mandate is a delegation bound to one intent.
+Intelligence proposes; it never authorizes. Records live in the owner's vault, not the app.
 
 ## Start
 
@@ -12,6 +15,10 @@ A token says WHO. A delegation says WHAT. Records live in the owner's vault, not
 - [create-primitives-app CLI](docs/create-app.md)
 - [Twelve principles](docs/principles.md)
 - [Architecture](docs/architecture.md)
+- [Product map — offerings, products, the harness program, what is in flight](docs/products.md)
+- [Rails, not throttles — why a kill switch is a revoke transaction, not a dial](docs/rails-not-throttles.md)
+- [Controls catalog — every asked-for control mapped to mechanism, spec, status](docs/controls-catalog.md)
+- Architecture diagrams (SVG + PNG): docs/assets/
 - [npm SDK](docs/sdk.md)
 - [Package catalog](docs/packages.md)
 - [Ethereum contracts](docs/contracts.md)
@@ -21,6 +28,27 @@ A token says WHO. A delegation says WHAT. Records live in the owner's vault, not
 - [Troubleshooting](docs/troubleshooting.md)
 - [Claude / Cursor](docs/vibe-coding.md)
 - [Assistant rules](AGENTS.md)
+
+## The argument (21 articles, published on LinkedIn)
+
+- [Series index](https://github.com/agentictrustlabs/agentic-primitives/blob/main/articles/README.md) — the anchor · authority · trust, discovery, privacy · acting
+- [Day 1 — The agentic web has a missing layer](https://github.com/agentictrustlabs/agentic-primitives/blob/main/articles/01-the-missing-layer.md)
+- [Day 6 — Delegation is the artefact, not the token](https://github.com/agentictrustlabs/agentic-primitives/blob/main/articles/06-delegation-is-the-artefact.md)
+- [Day 11 — Trust is a graph, not a score](https://github.com/agentictrustlabs/agentic-primitives/blob/main/articles/11-trust-is-a-graph.md)
+- [Day 16 — Planner proposes, mandate authorizes, executor acts, receipt proves](https://github.com/agentictrustlabs/agentic-primitives/blob/main/articles/16-planner-mandate-executor-receipt.md)
+- [Day 21 — What we got wrong, and the numbers we owe](https://github.com/agentictrustlabs/agentic-primitives/blob/main/articles/21-what-we-owe.md)
+
+## Release binding (generated — resolve, never copy)
+
+- [Release manifest](release-manifest.json) — pins, deployments, skills, endpoints
+- [Release binding guide](docs/release-binding.md)
+- [Package pins](catalog/packages.json) — 75 exact versions
+- [Contract index](catalog/contracts.json) — 43 deployments on eip155:84532 + 43 on eip155:34348
+- Deployment records: contracts/deployments/eip155-84532/base-sepolia-2026.09.0/ (verified) and
+  contracts/deployments/eip155-34348/faithchain-2026.09.0/ (resolved, gated RPC)
+- Released ABIs: contracts/abis/ (63)
+- Developer skills: skills/ (13, projected to .claude/.cursor/.agents)
+- [Developer MCP server](packages/dev-mcp/README.md) — read-only, 9 tools; upstream's `npx ap mcp` is the same idea over installed packages
 
 ## Example app (not the product)
 
@@ -42,3 +70,5 @@ A token says WHO. A delegation says WHAT. Records live in the owner's vault, not
 6. Never hand-roll EIP-712 or a signature check — use `@agenticprimitives/delegation`.
 7. Never widen the Home issuer allowlist.
 8. The address is the identity; a name is a transferable facet.
+9. Never let a planner's opinion decide whether a step is allowed — a grant does, checked per step.
+10. Never act on a cached verdict — re-verify after every approval.

@@ -23,19 +23,19 @@
   },
   "pnpm": {
     "overrides": {
-      "@agenticprimitives/a2a": "0.0.0-alpha.18",
-      "@agenticprimitives/agent-account": "1.0.0-alpha.21",
-      "@agenticprimitives/agent-naming": "1.0.0-alpha.21",
-      "@agenticprimitives/agent-profile": "1.0.0-alpha.21",
-      "@agenticprimitives/agent-relationships": "1.0.0-alpha.21",
-      "@agenticprimitives/audit": "1.0.0-alpha.21",
-      "@agenticprimitives/connect-client": "1.0.0-alpha.10",
-      "@agenticprimitives/content-primitives": "1.0.0-alpha.22",
-      "@agenticprimitives/contracts": "1.0.0-alpha.21",
-      "@agenticprimitives/delegation": "1.0.0-alpha.21",
-      "@agenticprimitives/fabric": "0.0.0-alpha.10",
-      "@agenticprimitives/home": "0.0.0-alpha.10",
-      "@agenticprimitives/types": "1.0.0-alpha.21"
+      "@agenticprimitives/a2a": "0.0.0-alpha.24",
+      "@agenticprimitives/agent-account": "1.0.0-alpha.26",
+      "@agenticprimitives/agent-naming": "1.0.0-alpha.26",
+      "@agenticprimitives/agent-profile": "1.0.0-alpha.26",
+      "@agenticprimitives/agent-relationships": "1.0.0-alpha.26",
+      "@agenticprimitives/audit": "1.0.0-alpha.26",
+      "@agenticprimitives/connect-client": "1.0.0-alpha.16",
+      "@agenticprimitives/content-primitives": "1.0.0-alpha.27",
+      "@agenticprimitives/contracts": "1.0.0-alpha.26",
+      "@agenticprimitives/delegation": "1.0.0-alpha.26",
+      "@agenticprimitives/fabric": "0.0.0-alpha.15",
+      "@agenticprimitives/home": "0.0.0-alpha.15",
+      "@agenticprimitives/types": "1.0.0-alpha.26"
     }
   }
 }

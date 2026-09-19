@@ -4,7 +4,7 @@ globs: ["**/*.ts", "**/*.tsx"]
 alwaysApply: true
 ---
 
-# Agentic Primitives — the four rules
+# Agentic Primitives — the five rules
 
 This looks like a normal OAuth + REST app. It is not one. The patterns you reach for by default are
 the ones this substrate exists to replace.
@@ -45,6 +45,13 @@ Render a link. Never retry, never work around, never fake success.
 `owner_only` means the operation belongs to the person alone. Redesign the feature; do not route
 around the gate.
 
+## 5. Domain shape lives in the ontology, not in a prompt or a table
+
+Whose treasury pays, who is a member of what, what an intent is — those are terms in
+`@agenticprimitives/ontology`, bound by IRI. Never re-describe a domain fact in a prompt, a
+`SKILL.md`, a lookup table, or a name-similarity heuristic (`alice` → `alice.treasury` was a real
+bug; her treasury had another name). A playbook says how an agent behaves and grants nothing.
+
 # Also
 
 - Privileged calls run **server-side**. The browser gets an `httpOnly` cookie it cannot read.
@@ -55,5 +62,7 @@ around the gate.
 - A named person's Home is their **subdomain**. Accept the apex and single-label subdomains of the
   zone; nothing else. Never widen this to make a login work.
 - Message bodies travel separately from envelopes, keyed by message id.
+- A mandate is a delegation with a `digestBinding` caveat and a `payment` caveat — not a type.
+  Risk is declared by the tool, never by the plan; a grant is re-checked after every approval.
 
 Full rules: `docs/principles.md`. Worked example: `apps/commons/src/worker/index.ts`.

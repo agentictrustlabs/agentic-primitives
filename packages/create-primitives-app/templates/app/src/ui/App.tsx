@@ -131,8 +131,8 @@ function Connect({ onError }: { onError: (e: AppError) => void }) {
   const demo = async (handle: string) => {
     setBusy(true);
     try {
-      await api.post('/api/connect/demo', { handle });
-      window.location.reload();
+      const r = await api.post<{ homeHandoff?: string }>('/api/connect/demo', { handle });
+      window.location.href = r.homeHandoff || '/';
     } catch (e) {
       if (e instanceof AppError) onError(e);
       setBusy(false);
