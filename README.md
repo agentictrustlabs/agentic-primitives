@@ -3,7 +3,7 @@
 [![CI](https://github.com/agentictrustlabs/agentic-primitives/actions/workflows/ci.yml/badge.svg)](https://github.com/agentictrustlabs/agentic-primitives/actions/workflows/ci.yml)
 [![npm org](https://img.shields.io/badge/npm-%40agenticprimitives-cb3837)](https://www.npmjs.com/org/agenticprimitives)
 [![chain](https://img.shields.io/badge/chain-Base%20Sepolia%2084532-0052ff)](docs/contracts.md)
-[![node](https://img.shields.io/badge/node-%E2%89%A5%2020-339933)](package.json)
+[![node](https://img.shields.io/badge/node-%E2%89%A5%2022-339933)](package.json)
 [![license](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
 **The missing layer of the agentic web — and it isn't discovery.**

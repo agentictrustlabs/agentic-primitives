@@ -10,7 +10,7 @@
     "create-primitives-app": "./packages/create-primitives-app/bin/cli.js"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
   },
   "scripts": {
     "dev": "pnpm --filter @starter/commons dev",

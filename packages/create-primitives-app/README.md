@@ -50,7 +50,7 @@ the box, and CI in the source repo proves that on every commit.
 
 ## Requirements
 
-Node ≥ 20, pnpm. The generated app deploys as a single Cloudflare Worker — no database, because
+Node ≥ 22, pnpm. The generated app deploys as a single Cloudflare Worker — no database, because
 durable records live in the owner's encrypted vault, reached through delegations they signed and
 can revoke on-chain.
 

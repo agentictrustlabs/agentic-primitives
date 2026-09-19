@@ -24,9 +24,12 @@ import {
 type Vars = { cfg: AppConfig; session: SessionData | null };
 const app = new Hono<{ Bindings: Env; Variables: Vars }>();
 
-const DEPLOYED = deployments as Record<string, string | number>;
+// The deployment map is flat except `permissionlessSubregistries`; keep only the top-level addresses.
+const DEPLOYED = deployments as Record<string, unknown>;
 const CONTRACTS = Object.fromEntries(
-  Object.entries(DEPLOYED).filter(([, v]) => typeof v === 'string' && /^0x[0-9a-fA-F]{40}$/.test(v)),
+  Object.entries(DEPLOYED).filter(
+    (entry): entry is [string, string] => typeof entry[1] === 'string' && /^0x[0-9a-fA-F]{40}$/.test(entry[1]),
+  ),
 ) as Record<string, string>;
 const DELEGATION_MANAGER = CONTRACTS.delegationManager ?? '';
 
