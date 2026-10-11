@@ -313,6 +313,7 @@ installs. Source, ADRs, specs, and the open findings ledger live in
 | **`apps/commons`** — the example: one Worker, a React SPA, no database, every pattern | [`apps/commons/src/worker/index.ts`](apps/commons/src/worker/index.ts) |
 | **The 21-part series** — the argument above, one idea a day, as published on LinkedIn | [`articles/`](articles/README.md) |
 | **The product map** — offerings, products, the harness program, what is in flight, with spec numbers and status | [docs/products.md](docs/products.md) |
+| **Operating it yourself** — the ladder: build on the substrate · stand up an estate · publish it in a town · the federation; one guide per scale, in the repository that owns it | [docs/operating.md](docs/operating.md) |
 | **Rails, not throttles** and **the controls catalog** — the case against a kill-switch-as-dial, and every asked-for control mapped to its mechanism and status | [docs/rails-not-throttles.md](docs/rails-not-throttles.md) · [docs/controls-catalog.md](docs/controls-catalog.md) |
 | **Architecture diagrams** — scope, the harness turn, the anchor, the rails; SVG source + 5760-px PNGs | [`docs/assets/`](docs/assets/) |
 
