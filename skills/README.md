@@ -17,7 +17,7 @@ node scripts/sync-skills.mjs --check  # CI: projections match skills/
 
 Runtime behaviour — what a *person's agent* or an *organization's agent* knows how to do — is a
 different kind of artifact and lives in a different repository:
-[`agentictrustlabs/skills`](https://github.com/agentictrustlabs/skills), the **skills corpus**.
+the **[skills corpus](https://skills.faithnet.io)** — browsable and independently verifiable there. How to author one: [docs/authoring-skills.md](../docs/authoring-skills.md).
 
 | | Developer skills (here) | Runtime playbooks (the corpus) |
 | --- | --- | --- |

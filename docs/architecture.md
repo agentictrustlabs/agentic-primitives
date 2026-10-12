@@ -115,7 +115,7 @@ receipt the same vocabulary read backwards. Prompts say how to behave. The ontol
 world is shaped.
 
 Runtime behaviour — what an agent knows how to do — is authored as versioned, digest-addressed
-playbooks in the [skills corpus](https://github.com/agentictrustlabs/skills), compiled into the
+playbooks in the [skills corpus](https://skills.faithnet.io), compiled into the
 harness by digest, and cited on every receipt. A playbook grants nothing; see
 [skills/README.md](../skills/README.md).
 
