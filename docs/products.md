@@ -2,7 +2,7 @@
 
 What is being built on the substrate, what is shipped, and what comes next — as of 2026-09-13.
 Everything here traces to a spec of record in the
-[source monorepo](https://github.com/agentictrustlabs/agenticprimitives/tree/master/specs); the
+[source monorepo](https://agenticprimitives.dev/developers) (private; the specs are referenced by number); the
 numbers in brackets are those specs. Where a status says *live*, it means a verify script runs
 against the deployment in the nightly live-gates ledger [392] with a negative twin.
 
@@ -26,7 +26,7 @@ not "reference apps"; they are the things people use.
 | **Home Build** | Build as a workspace mode: behaviour first, then code | Behaviour: author → lint → publish → assign → run → receipt cites the version. Code: a repository attached to a workspace, an external editor or ACP runtime as the hands, review with recorded evidence, promotion bound to an intent digest | Behaviour loop landing with [400 W3]; code review loop live on GitHub as the forge [400 W3/W4]; gate G4 of [398] |
 | **Developer Kit** | Build *with* AP before building *inside* Home | This repo (pins, contracts, rails, `create-primitives-app`, 13 skills, the read-only Developer MCP) and upstream's `@agenticprimitives/devkit` (`ap doctor` · `upgrade` · `conform` · `test` · `mcp`) + `@agenticprimitives/create-app` (a product repo from the template, with `agentic.lock.json`) | Both published; see [packages.md](./packages.md#developer-kit) and [release-binding.md](./release-binding.md) |
 
-The **skills corpus** ([`agentictrustlabs/skills`](https://github.com/agentictrustlabs/skills)) is
+The **skills corpus** ([the corpus](https://skills.faithnet.io)) is
 the plane the products share for behaviour: archetypes, verifiable playbooks, domain libraries. It
 imports the packages and is never imported back — see [skills/README.md](../skills/README.md).
 

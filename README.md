@@ -216,7 +216,7 @@ relationship had been in the ontology the whole time; the resolver just wasn't r
 ## Behaviour is authored in the skills corpus — and grants nothing
 
 The harness needs to know what an agent *knows how to do*. That is authored in
-[`skills`](https://github.com/agentictrustlabs/skills) — a separate repository that imports
+[the skills corpus](https://skills.faithnet.io) — a separate repository that imports
 `@agenticprimitives/*` and is never imported back — and it is where most of the *behavioural*
 differentiation lives:
 
@@ -298,7 +298,7 @@ evidence trail — and the seams between rows are exactly where stitched stacks 
 
 This is the **developer kit** for that substrate — the public, pinned, verified surface a builder
 installs. Source, ADRs, specs, and the open findings ledger live in
-[`agenticprimitives`](https://github.com/agentictrustlabs/agenticprimitives).
+`agenticprimitives`, the private source monorepo.
 
 | | |
 | --- | --- |
@@ -307,12 +307,16 @@ installs. Source, ADRs, specs, and the open findings ledger live in
 | **Three live rails** — Home, A2A, vault — nothing mocked | [docs/live-endpoints.md](docs/live-endpoints.md) |
 | **`create-primitives-app`** — scaffold a relying app: connect via a Home, act under a wire, keep records in the owner's vault | [docs/create-app.md](docs/create-app.md) |
 | **`npx ap`** — upstream's Developer Kit CLI: `doctor`, `upgrade`, `conform`, `test`, `mcp`; `@agenticprimitives/create-app` for a product repo | [docs/packages.md#developer-kit](docs/packages.md#developer-kit) |
-| **13 developer Agent Skills**, projected to `.claude/`, `.cursor/`, `.agents/`; runtime behaviour lives in the [skills corpus](https://github.com/agentictrustlabs/skills) | [`skills/`](skills/) · [`skills/README.md`](skills/README.md) |
+| **13 developer Agent Skills**, projected to `.claude/`, `.cursor/`, `.agents/`; runtime behaviour lives in the [skills corpus](https://skills.faithnet.io) | [`skills/`](skills/) · [`skills/README.md`](skills/README.md) |
 | **The ontology** — T-box, SHACL shapes, typed IRI constants, vault-record bindings — the vocabulary everything binds to | [`@agenticprimitives/ontology`](https://www.npmjs.com/package/@agenticprimitives/ontology) · [docs/packages.md](docs/packages.md#content--credentials) |
 | **A read-only Developer MCP** — release facts as tools, no keys, no vault, no authority | [`packages/dev-mcp`](packages/dev-mcp/README.md) |
 | **`apps/commons`** — the example: one Worker, a React SPA, no database, every pattern | [`apps/commons/src/worker/index.ts`](apps/commons/src/worker/index.ts) |
 | **The 21-part series** — the argument above, one idea a day, as published on LinkedIn | [`articles/`](articles/README.md) |
 | **The product map** — offerings, products, the harness program, what is in flight, with spec numbers and status | [docs/products.md](docs/products.md) |
+| **Five builds** — pick what you are building: an app · a behaviour · a service agent · an estate · a town. One guide each, and how to tell which one you are doing | [docs/builds.md](docs/builds.md) |
+| **Build a service agent** — the two shapes, the four birthrights a charter must finish, and how another person's agent reaches it | [docs/build-a-service-agent.md](docs/build-a-service-agent.md) |
+| **Authoring skills** — the execution contract in a playbook's frontmatter; define the capability once and the agent surfaces follow | [docs/authoring-skills.md](docs/authoring-skills.md) |
+| **Operating it yourself** — the ladder: an estate of your own, a town of your own; one guide per scale, in the repository that owns it | [docs/operating.md](docs/operating.md) · [docs/estate-anatomy.md](docs/estate-anatomy.md) |
 | **Rails, not throttles** and **the controls catalog** — the case against a kill-switch-as-dial, and every asked-for control mapped to its mechanism and status | [docs/rails-not-throttles.md](docs/rails-not-throttles.md) · [docs/controls-catalog.md](docs/controls-catalog.md) |
 | **Architecture diagrams** — scope, the harness turn, the anchor, the rails; SVG source + 5760-px PNGs | [`docs/assets/`](docs/assets/) |
 
@@ -329,7 +333,8 @@ pnpm doctor:full           # npm pins exist · rails respond · eth_getCode on e
 pnpm create-app my-app     # or: npx create-primitives-app my-app
 ```
 
-Then: [Construct a project](docs/getting-started.md) · [Register at a Home](docs/register-your-app.md)
+Then: **[pick your build](docs/builds.md)** — an app, a behaviour, a service agent, an estate or a town — or go
+straight to [Construct a project](docs/getting-started.md) · [Register at a Home](docs/register-your-app.md)
 · [Point Claude or Cursor at it](docs/vibe-coding.md).
 
 ---
@@ -419,7 +424,7 @@ What we owe, stated plainly because the series states it ([Day 21](articles/21-w
 - The ERC-8004 and ANS adapters are the largest unbuilt piece of the external footprint.
 
 The source monorepo publishes an
-[open findings ledger](https://github.com/agentictrustlabs/agenticprimitives/blob/master/docs/audits/findings.yaml)
+[open findings ledger](https://agenticprimitives.dev/audits)
 and keeps it CI-gated: a "closed" finding must anchor to real source or the build fails. Trust
 infrastructure should be the most transparent code you depend on.
 

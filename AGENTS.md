@@ -61,7 +61,7 @@ agent that holds it*, *an inbox belongs to a person*, *a team has members* — t
 `@agenticprimitives/ontology`, bound by IRI. Never re-describe it in a prompt, a `SKILL.md`, a
 lookup table, or a string-similarity heuristic. The upstream bug this rule is made of: a resolver
 guessed `alice` → `alice.treasury`; Alice's treasury had another name; the relationship was in the
-ontology the whole time. Runtime playbooks (the [skills corpus](https://github.com/agentictrustlabs/skills))
+ontology the whole time. Runtime playbooks (the [skills corpus](https://skills.faithnet.io))
 say how an agent behaves and grant nothing; they are not where the world's shape is written down.
 
 ## Versions and addresses: resolve, never copy
